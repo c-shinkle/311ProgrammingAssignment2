@@ -14,19 +14,19 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class WikiCrawler {
-	static int indexCount = 0;
+	private static int indexCount = 0;
 
-	static final String BASE_URL = "https://en.wikipedia.org";
+	private static final String BASE_URL = "https://en.wikipedia.org";
 
-	static int requests = 0;
+	private static int requests = 0;
 
-	int max;
+	private int max;
 
-	String url;
+	private String url;
 
-	ArrayList<String> topics;
+	private ArrayList<String> topics;
 
-	String fileName;
+	private String fileName;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
