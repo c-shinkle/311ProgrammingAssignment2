@@ -18,8 +18,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Scanner;
 
 public class WikiCrawler {
 
@@ -48,24 +50,66 @@ public class WikiCrawler {
 		queue.add(seedUrl);
 		visited.add(seedUrl);
 		while (!queue.isEmpty()) {
-			String currentPage = queue.peek();
-			String currentPageHTML = fetchPage(currentPage);
-			ArrayList<String> currentPageLinks = extractLinks(currentPageHTML);
-			for (int i = 0; i < currentPageLinks.size(); i++) {
+			String curPage = queue.peek();
+			String curPageHTML = fetchPage(curPage);
+			ArrayList<String> curPageLinks = extractLinks(curPageHTML);
+			for (int i = 0; i < curPageLinks.size(); i++) {
 				for (int k = 0; k < visited.size(); k++) {
-					if (!(visited.get(k).contains(currentPageLinks.get(i)))) {
-							queue.add(currentPageLinks.get(i));
-							visited.add(currentPageLinks.get(i));
+					if (!(visited.get(k).contains(curPageLinks.get(i)))) {
+						queue.add(curPageLinks.get(i));
+						visited.add(curPageLinks.get(i));
 					}
 				}
 			}
 		}
 	}
 
-	private ArrayList<String> extractLinks(String currentPageHTML) {
-		ArrayList<String> currentPageLinks = new ArrayList<String>();
-		//TODO
-		return currentPageLinks;
+	private ArrayList<String> extractLinks(String HTML) {
+		// Create subString starting after first <p>
+		String subHTML = null;
+		for (int x = 0; x < HTML.length(); x++) {
+			if (HTML.charAt(x) == '<') {
+				if (HTML.charAt(x + 1) == 'p' && HTML.charAt(x + 2) == '>') {
+					subHTML = HTML.substring(x + 3, HTML.length());
+					break;
+				}
+			}
+		}
+		// find links in subHTML
+		ArrayList<String> links = new ArrayList<String>();
+		HashSet<String> set = new HashSet<String>();
+		String line = subHTML;
+		Scanner words = new Scanner(line);
+		while (words.hasNext()) {
+			String word = words.next();
+			if (word.contains("href") && word.contains("/wiki/")) {
+				int first = 0;
+				int last = 0;
+				for (int x = 0; x < word.length(); x++) {
+					if (word.charAt(x) == '"' && word.charAt(x - 1) == '=') {
+						first = x + 1;
+					}
+					if (word.charAt(x) == '"' && word.charAt(x - 1) != '=') {
+						last = x;
+						break;
+					}
+				}
+				String link = word.substring(first, last);
+				if (!link.contains(":") && !link.contains("#") && !set.contains(link)) {
+					if (link.contains(".")) {
+						if (link.contains(".com") || link.contains(".html")) { // change
+							links.add(link);
+							set.add(link);
+						}
+					} else {
+						links.add(link);
+						set.add(link);
+					}
+				}
+			}
+			words.close();
+		}
+		return links;
 	}
 
 	private String fetchPage(String currentPage) throws IOException {
