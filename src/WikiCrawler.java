@@ -45,6 +45,10 @@ public class WikiCrawler {
 	}
 
 	public void crawl() throws IOException {
+		String seedUrlHTML = fetchPage(seedUrl);
+		if(!hasTopics(seedUrlHTML)) {
+			
+		}
 		Queue<String> queue = new LinkedList<String>();
 		LinkedList<String> visited = new LinkedList<String>();
 		queue.add(seedUrl);
@@ -63,18 +67,10 @@ public class WikiCrawler {
 			}
 		}
 	}
-
-	private ArrayList<String> extractLinks(String HTML) {
-		// Create subString starting after first <p>
-		String subHTML = null;
-		for (int x = 0; x < HTML.length(); x++) {
-			if (HTML.charAt(x) == '<') {
-				if (HTML.charAt(x + 1) == 'p' && HTML.charAt(x + 2) == '>') {
-					subHTML = HTML.substring(x + 3, HTML.length());
-					break;
-				}
-			}
-		}
+	private boolean hasTopics(String subHTML) {
+		return true;
+	}
+	private ArrayList<String> extractLinks(String subHTML) {
 		// find links in subHTML
 		ArrayList<String> links = new ArrayList<String>();
 		HashSet<String> set = new HashSet<String>();
@@ -132,7 +128,19 @@ public class WikiCrawler {
 			a.append(inputLine);
 		}
 		br.close();
-		return a.toString();
+		String HTML = a.toString();
+
+		// Create subString starting after first <p>
+		String subHTML = null;
+		for (int x = 0; x < HTML.length(); x++) {
+			if (HTML.charAt(x) == '<') {
+				if (HTML.charAt(x + 1) == 'p' && HTML.charAt(x + 2) == '>') {
+					subHTML = HTML.substring(x + 3, HTML.length());
+					break;
+				}
+			}
+		}
+		return subHTML;
 	}
 
 	public static void main(String[] args) throws IOException {
