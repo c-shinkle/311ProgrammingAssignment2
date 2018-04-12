@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 
@@ -175,7 +176,10 @@ public class WikiCrawler {
 	private void writeToFile(HashMap<String,ArrayList<String>> digraph ) throws IOException {
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
-		printWriter.print("Some String");
+		printWriter.print(max);
+		for (Map.Entry<String, ArrayList<String>> entry : digraph.entrySet()) {
+		    printWriter.print(entry.getKey() + " " + entry.getValue());
+		}
 		printWriter.close();
 	}
 
