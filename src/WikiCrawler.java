@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-import WikiCrawler.Node;
+
 
 public class WikiCrawler {
 
@@ -63,6 +63,9 @@ public class WikiCrawler {
 			String curPage = queue.peek();
 			String curPageHTML = fetchPage(curPage);
 			ArrayList<String> curPageLinks = extractLinks(curPageHTML);
+			for(int i=0; i<curPageLinks.size();i++) {
+				System.out.println(curPageLinks.get(i));
+			}
 			for (int i = 0; i < curPageLinks.size(); i++) {
 				for (int k = 0; k < visited.size(); k++) {
 					if (!(visited.get(k).contains(curPageLinks.get(i)))) {
@@ -71,28 +74,6 @@ public class WikiCrawler {
 					}
 				}
 			}
-		}
-		File storedFile = new File(this.fileName);
-
-		try {
-			storedFile.createNewFile();
-			PrintWriter writer = new PrintWriter(storedFile);
-			writer.println(h.size());
-			Collection col = h.values();
-			Object[] nodes = col.toArray();
-
-			for (int x = 0; x < nodes.length; x++) {
-				Node tem = (Node) nodes[x];
-				for (int y = 0; y < tem.adj.size(); y++) {
-					writer.println(tem.link + " " + tem.adj.get(y).link);
-				}
-			}
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
 		}
 	}
 
@@ -138,8 +119,8 @@ public class WikiCrawler {
 					}
 				}
 			}
-			words.close();
 		}
+		words.close();
 		return links;
 	}
 
@@ -180,7 +161,8 @@ public class WikiCrawler {
 	}
 
 	public static void main(String[] args) throws IOException {
-		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, null, "wikiCC.txt");
+		ArrayList<String> topics = new ArrayList<String>();
+		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
 		example.crawl();
 	}
 }
