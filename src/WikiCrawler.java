@@ -14,6 +14,7 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,12 +23,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-
-
 
 public class WikiCrawler {
 
@@ -41,7 +41,8 @@ public class WikiCrawler {
 
 	private String fileName;
 
-	private static int requests;
+	// used for junit tests. DELETE before we turn in!!
+	public ArrayList<String> extractLinksTest;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
@@ -51,30 +52,39 @@ public class WikiCrawler {
 	}
 
 	public void crawl() throws IOException {
+		
+		HashMap<String,ArrayList<String>> graph = new HashMap<String,ArrayList<String>>();
+		
 		String seedUrlHTML = fetchPage(seedUrl);
+		// for testing purposes only. DELETE afterwards!
+		extractLinksTest = extractLinks(seedUrlHTML);
 		if (!hasTopics(seedUrlHTML)) {
 
 		}
+		
 		Queue<String> queue = new LinkedList<String>();
 		LinkedList<String> visited = new LinkedList<String>();
 		queue.add(seedUrl);
 		visited.add(seedUrl);
 		while (!queue.isEmpty()) {
-			String curPage = queue.peek();
-			String curPageHTML = fetchPage(curPage);
-			ArrayList<String> curPageLinks = extractLinks(curPageHTML);
-			for(int i=0; i<curPageLinks.size();i++) {
-				System.out.println(curPageLinks.get(i));
-			}
-			for (int i = 0; i < curPageLinks.size(); i++) {
-				for (int k = 0; k < visited.size(); k++) {
-					if (!(visited.get(k).contains(curPageLinks.get(i)))) {
-						queue.add(curPageLinks.get(i));
-						visited.add(curPageLinks.get(i));
+				String curPage = queue.poll();
+				String curPageHTML = fetchPage(curPage);
+				ArrayList<String> curPageLinks = extractLinks(curPageHTML);
+				if (visited.size() < max) {
+				for (int i = 0; i < curPageLinks.size(); i++) {
+					System.out.println(curPageLinks.get(i));
+				}
+				for (int i = 0; i < curPageLinks.size(); i++) {
+					for (int k = 0; k < visited.size(); k++) {
+						if (!(visited.get(k).contains(curPageLinks.get(i)))) {
+							queue.add(curPageLinks.get(i));
+							visited.add(curPageLinks.get(i));
+						}
 					}
 				}
 			}
 		}
+		writeToFile(graph);
 	}
 
 	// Checks if the “actual text component” contains all of the topics
@@ -87,7 +97,8 @@ public class WikiCrawler {
 		return true;
 	}
 
-	//returns all of the valid links in the “actual text component” of the current page.  
+	// returns all of the valid links in the “actual text component” of the current
+	// page.
 	private ArrayList<String> extractLinks(String subHTML) {
 		ArrayList<String> links = new ArrayList<String>();
 		HashSet<String> set = new HashSet<String>();
@@ -124,7 +135,8 @@ public class WikiCrawler {
 		return links;
 	}
 
-	//makes a request to the server to fetch html of the current page and creates a string for the “actual text component” of the page. 
+	// makes a request to the server to fetch html of the current page and creates a
+	// string for the “actual text component” of the page.
 	private String fetchPage(String currentPage) throws IOException {
 		URL url = null;
 		InputStream is = null;
@@ -158,6 +170,13 @@ public class WikiCrawler {
 			}
 		}
 		return subHTML;
+	}
+
+	private void writeToFile(HashMap<String,ArrayList<String>> digraph ) throws IOException {
+		FileWriter fileWriter = new FileWriter(fileName);
+		PrintWriter printWriter = new PrintWriter(fileWriter);
+		printWriter.print("Some String");
+		printWriter.close();
 	}
 
 	public static void main(String[] args) throws IOException {
