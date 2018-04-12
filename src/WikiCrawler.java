@@ -12,16 +12,22 @@
 */
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+
+import WikiCrawler.Node;
 
 public class WikiCrawler {
 
@@ -46,8 +52,8 @@ public class WikiCrawler {
 
 	public void crawl() throws IOException {
 		String seedUrlHTML = fetchPage(seedUrl);
-		if(!hasTopics(seedUrlHTML)) {
-			
+		if (!hasTopics(seedUrlHTML)) {
+
 		}
 		Queue<String> queue = new LinkedList<String>();
 		LinkedList<String> visited = new LinkedList<String>();
@@ -66,16 +72,45 @@ public class WikiCrawler {
 				}
 			}
 		}
+		File storedFile = new File(this.fileName);
+
+		try {
+			storedFile.createNewFile();
+			PrintWriter writer = new PrintWriter(storedFile);
+			writer.println(h.size());
+			Collection col = h.values();
+			Object[] nodes = col.toArray();
+
+			for (int x = 0; x < nodes.length; x++) {
+				Node tem = (Node) nodes[x];
+				for (int y = 0; y < tem.adj.size(); y++) {
+					writer.println(tem.link + " " + tem.adj.get(y).link);
+				}
+			}
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 	}
+
+	// Checks if the “actual text component” contains all of the topics
 	private boolean hasTopics(String subHTML) {
+		for (int i = 0; i < topics.size(); i++) {
+			if (!subHTML.toLowerCase().contains(topics.get(i).toLowerCase())) {
+				return false;
+			}
+		}
 		return true;
 	}
+
+	//returns all of the valid links in the “actual text component” of the current page.  
 	private ArrayList<String> extractLinks(String subHTML) {
-		// find links in subHTML
 		ArrayList<String> links = new ArrayList<String>();
 		HashSet<String> set = new HashSet<String>();
-		String line = subHTML;
-		Scanner words = new Scanner(line);
+		Scanner words = new Scanner(subHTML);
 		while (words.hasNext()) {
 			String word = words.next();
 			if (word.contains("href") && word.contains("/wiki/")) {
@@ -108,6 +143,7 @@ public class WikiCrawler {
 		return links;
 	}
 
+	//makes a request to the server to fetch html of the current page and creates a string for the “actual text component” of the page. 
 	private String fetchPage(String currentPage) throws IOException {
 		URL url = null;
 		InputStream is = null;
