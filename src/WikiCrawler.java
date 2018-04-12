@@ -42,7 +42,8 @@ public class WikiCrawler {
 
 	private String fileName;
 
-	// used for junit tests. DELETE before we turn in!!
+	private int requests;
+	
 	public ArrayList<String> extractLinksTest;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
@@ -52,34 +53,38 @@ public class WikiCrawler {
 		this.fileName = fileName;
 	}
 
-	public void crawl() throws IOException {
-		
-		HashMap<String,ArrayList<String>> graph = new HashMap<String,ArrayList<String>>();
+	public void crawl() throws IOException, InterruptedException {
+
+		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
+
 		
 		String seedUrlHTML = fetchPage(seedUrl);
-		// for testing purposes only. DELETE afterwards!
-		extractLinksTest = extractLinks(seedUrlHTML);
-		if (!hasTopics(seedUrlHTML)) {
+		// If seedUrl does not contain all words from topics, then the graph constructed
+		// is empty graph
+		if (hasTopics(seedUrlHTML)) {
 
-		}
-		
-		Queue<String> queue = new LinkedList<String>();
-		LinkedList<String> visited = new LinkedList<String>();
-		queue.add(seedUrl);
-		visited.add(seedUrl);
-		while (!queue.isEmpty()) {
+			// initialize queue and visited and add root to each
+			Queue<String> queue = new LinkedList<String>();
+			LinkedList<String> visited = new LinkedList<String>();
+			queue.add(seedUrl);
+			visited.add(seedUrl);
+
+			while (!queue.isEmpty()) {
 				String curPage = queue.poll();
 				String curPageHTML = fetchPage(curPage);
 				ArrayList<String> curPageLinks = extractLinks(curPageHTML);
 				if (visited.size() < max) {
-				for (int i = 0; i < curPageLinks.size(); i++) {
-					System.out.println(curPageLinks.get(i));
-				}
-				for (int i = 0; i < curPageLinks.size(); i++) {
-					for (int k = 0; k < visited.size(); k++) {
-						if (!(visited.get(k).contains(curPageLinks.get(i)))) {
-							queue.add(curPageLinks.get(i));
-							visited.add(curPageLinks.get(i));
+					for (int i = 0; i < curPageLinks.size(); i++) {
+						for (int k = 0; k < visited.size(); k++) {
+							if (!(visited.get(k).contains(curPageLinks.get(i)))) {
+								ArrayList<String> pageLinks = new ArrayList<String>();
+								if(hasTopics(curPageLinks.get(i))) {
+								queue.add(curPageLinks.get(i));
+								pageLinks.add(curPageLinks.get(i));
+								graph.put(curPage,pageLinks);
+								}
+								visited.add(curPageLinks.get(i));
+							}
 						}
 					}
 				}
@@ -89,7 +94,8 @@ public class WikiCrawler {
 	}
 
 	// Checks if the “actual text component” contains all of the topics
-	private boolean hasTopics(String subHTML) {
+	private boolean hasTopics(String url) throws IOException, InterruptedException {
+		String subHTML = fetchPage(url);
 		for (int i = 0; i < topics.size(); i++) {
 			if (!subHTML.toLowerCase().contains(topics.get(i).toLowerCase())) {
 				return false;
@@ -138,7 +144,11 @@ public class WikiCrawler {
 
 	// makes a request to the server to fetch html of the current page and creates a
 	// string for the “actual text component” of the page.
-	private String fetchPage(String currentPage) throws IOException {
+	private String fetchPage(String currentPage) throws IOException, InterruptedException {
+		if(requests==25) {
+			Thread.sleep(3000);
+		}
+		requests = 0;
 		URL url = null;
 		InputStream is = null;
 		try {
@@ -170,20 +180,21 @@ public class WikiCrawler {
 				}
 			}
 		}
+		requests++;
 		return subHTML;
 	}
 
-	private void writeToFile(HashMap<String,ArrayList<String>> digraph ) throws IOException {
+	private void writeToFile(HashMap<String, ArrayList<String>> digraph) throws IOException {
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
 		printWriter.print(max);
 		for (Map.Entry<String, ArrayList<String>> entry : digraph.entrySet()) {
-		    printWriter.print(entry.getKey() + " " + entry.getValue());
+			printWriter.print(entry.getKey() + " " + entry.getValue());
 		}
 		printWriter.close();
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		ArrayList<String> topics = new ArrayList<String>();
 		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
 		example.crawl();
