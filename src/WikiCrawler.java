@@ -106,7 +106,25 @@ public class WikiCrawler {
 	// returns all of the valid links in the “actual text component” of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML) {
-		return null;
+		HashSet<String> linkz = new HashSet<String>();
+		Scanner scan = new Scanner(subHTML);
+		String wiki = "/wiki/";
+		while (scan.hasNext()) {
+			String next = scan.next();
+			if (next.contains("/wiki/")) {
+				int startIndex = next.indexOf(wiki);
+				int endIndex = next.length() - 1;
+				String possibleLink = next.substring(startIndex, endIndex);
+				if (!possibleLink.contains("#") && !possibleLink.contains(":")) {
+					if (!linkz.contains(possibleLink)) {
+						linkz.add(possibleLink);
+					}
+				}
+			}
+		}
+		scan.close();
+		ArrayList<String> links = new ArrayList<String>(linkz);
+		return links;
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
@@ -141,10 +159,11 @@ public class WikiCrawler {
 		// Create subString starting after first <p>
 		String p1 = "<p>";
 		int startIndex = HTML.indexOf(p1);
-		String subHTML = HTML.substring(startIndex,HTML.length());
+		String subHTML = HTML.substring(startIndex, HTML.length());
 		return subHTML;
 	}
 
+	// Takes the graph and saves it to a file by listing out all of the edges.
 	private void writeToFile(HashMap<String, ArrayList<String>> digraph) throws IOException {
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
