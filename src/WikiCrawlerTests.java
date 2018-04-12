@@ -17,27 +17,27 @@ class WikiCrawlerTests {
 	
 	
 	
-	//Test for extractLinks helper method
+	//Test for findLinks helper method
 	
 	@Test
-	void extractLinks1() throws IOException, InterruptedException {
+	void findLinks1() throws IOException, InterruptedException {
 		complexityTheory.crawl();
 		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = complexityTheory.extractLinksTest;
+		ArrayList<String> actual = complexityTheory.findLinksTest;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void extractLinks2() throws IOException, InterruptedException {
+	void findLinks2() throws IOException, InterruptedException {
 		iowaState.crawl();
 		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = iowaState.extractLinksTest;
+		ArrayList<String> actual = iowaState.findLinksTest;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void extractLinks3() throws IOException, InterruptedException {
+	void findLinks3() throws IOException, InterruptedException {
 		comScience.crawl();
 		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = comScience.extractLinksTest;
+		ArrayList<String> actual = comScience.findLinksTest;
 		assertEquals(expected,actual);
 	}
 	

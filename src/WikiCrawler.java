@@ -43,8 +43,8 @@ public class WikiCrawler {
 	private String fileName;
 
 	private int requests;
-	
-	public ArrayList<String> extractLinksTest;
+
+	public ArrayList<String> findLinksTest;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
@@ -57,7 +57,6 @@ public class WikiCrawler {
 
 		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
 
-		
 		String seedUrlHTML = fetchPage(seedUrl);
 		// If seedUrl does not contain all words from topics, then the graph constructed
 		// is empty graph
@@ -72,16 +71,16 @@ public class WikiCrawler {
 			while (!queue.isEmpty()) {
 				String curPage = queue.poll();
 				String curPageHTML = fetchPage(curPage);
-				ArrayList<String> curPageLinks = extractLinks(curPageHTML);
+				ArrayList<String> curPageLinks = findLinks(curPageHTML);
 				if (visited.size() < max) {
 					for (int i = 0; i < curPageLinks.size(); i++) {
 						for (int k = 0; k < visited.size(); k++) {
 							if (!(visited.get(k).contains(curPageLinks.get(i)))) {
 								ArrayList<String> pageLinks = new ArrayList<String>();
-								if(hasTopics(curPageLinks.get(i))) {
-								queue.add(curPageLinks.get(i));
-								pageLinks.add(curPageLinks.get(i));
-								graph.put(curPage,pageLinks);
+								if (hasTopics(curPageLinks.get(i))) {
+									queue.add(curPageLinks.get(i));
+									pageLinks.add(curPageLinks.get(i));
+									graph.put(curPage, pageLinks);
 								}
 								visited.add(curPageLinks.get(i));
 							}
@@ -106,49 +105,18 @@ public class WikiCrawler {
 
 	// returns all of the valid links in the “actual text component” of the current
 	// page.
-	private ArrayList<String> extractLinks(String subHTML) {
-		ArrayList<String> links = new ArrayList<String>();
-		HashSet<String> set = new HashSet<String>();
-		Scanner words = new Scanner(subHTML);
-		while (words.hasNext()) {
-			String word = words.next();
-			if (word.contains("href") && word.contains("/wiki/")) {
-				int first = 0;
-				int last = 0;
-				for (int x = 0; x < word.length(); x++) {
-					if (word.charAt(x) == '"' && word.charAt(x - 1) == '=') {
-						first = x + 1;
-					}
-					if (word.charAt(x) == '"' && word.charAt(x - 1) != '=') {
-						last = x;
-						break;
-					}
-				}
-				String link = word.substring(first, last);
-				if (!link.contains(":") && !link.contains("#") && !set.contains(link)) {
-					if (link.contains(".")) {
-						if (link.contains(".com") || link.contains(".html")) { // change
-							links.add(link);
-							set.add(link);
-						}
-					} else {
-						links.add(link);
-						set.add(link);
-					}
-				}
-			}
-		}
-		words.close();
-		return links;
+	private ArrayList<String> findLinks(String subHTML) {
+		return null;
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
 	// string for the “actual text component” of the page.
 	private String fetchPage(String currentPage) throws IOException, InterruptedException {
-		if(requests==25) {
+		requests++;
+		int mod = requests % 25;
+		if (mod == 0) {
 			Thread.sleep(3000);
 		}
-		requests = 0;
 		URL url = null;
 		InputStream is = null;
 		try {
@@ -162,25 +130,18 @@ public class WikiCrawler {
 			return null;
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String inputLine;
-		StringBuilder a = new StringBuilder();
-		while ((inputLine = br.readLine()) != null) {
-			a.append(inputLine);
+		String input;
+		StringBuilder builder = new StringBuilder();
+		while ((input = br.readLine()) != null) {
+			builder.append(input);
 		}
 		br.close();
-		String HTML = a.toString();
+		String HTML = builder.toString();
 
 		// Create subString starting after first <p>
-		String subHTML = null;
-		for (int x = 0; x < HTML.length(); x++) {
-			if (HTML.charAt(x) == '<') {
-				if (HTML.charAt(x + 1) == 'p' && HTML.charAt(x + 2) == '>') {
-					subHTML = HTML.substring(x + 3, HTML.length());
-					break;
-				}
-			}
-		}
-		requests++;
+		String p1 = "<p>";
+		int startIndex = HTML.indexOf(p1);
+		String subHTML = HTML.substring(startIndex,HTML.length());
 		return subHTML;
 	}
 
