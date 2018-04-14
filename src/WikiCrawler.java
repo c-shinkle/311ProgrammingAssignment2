@@ -52,40 +52,41 @@ public class WikiCrawler {
 	}
 
 	public void crawl() throws IOException, InterruptedException {
-
 		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
-		// If seedUrl does not contain all words from topics, then the graph constructed
-		// is empty graph
 		if (hasTopics(seedUrl)) {
-
-			// initialize queue and visited and add root to each
 			Queue<String> queue = new LinkedList<String>();
 			LinkedList<String> visited = new LinkedList<String>();
 			queue.add(seedUrl);
 			visited.add(seedUrl);
-
 			while (!queue.isEmpty()) {
-				String curPage = queue.poll();
-				String curPageHTML = fetchPage(curPage);
-				ArrayList<String> curPageLinks = findLinks(curPageHTML);
 				if (visited.size() < max) {
+					String curPage = queue.poll();
+					String curPageHTML = fetchPage(curPage);
+					ArrayList<String> curPageLinks = findLinks(curPageHTML);
+					ArrayList<String> pageLinks = new ArrayList<String>();
 					for (int i = 0; i < curPageLinks.size(); i++) {
-						for (int k = 0; k < visited.size(); k++) {
-							if (!(visited.get(k).contains(curPageLinks.get(i)))) {
-								ArrayList<String> pageLinks = new ArrayList<String>();
-								if (hasTopics(curPageLinks.get(i))) {
-									queue.add(curPageLinks.get(i));
-									pageLinks.add(curPageLinks.get(i));
-									graph.put(curPage, pageLinks);
-								}
-								visited.add(curPageLinks.get(i));
+						if (!hasVisited(curPageLinks.get(i), visited)) {
+							if (hasTopics(curPageLinks.get(i))) {
+								queue.add(curPageLinks.get(i));
+								pageLinks.add(curPageLinks.get(i));
+								graph.put(curPage, pageLinks);
 							}
+							visited.add(curPageLinks.get(i));
 						}
 					}
 				}
 			}
 		}
 		writeToFile(graph);
+	}
+
+	private boolean hasVisited(String link, LinkedList<String> visited) {
+		for (int i = 0; i < visited.size(); i++) {
+			if (visited.get(i).contains(link)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// Checks if the “actual text component” contains all of the topics
@@ -115,7 +116,7 @@ public class WikiCrawler {
 			int endIndex = 0;
 			if (next.contains(wiki) && next.contains(href)) {
 				for (int i = 0; i < next.length(); i++) {
-					if (next.charAt(i - 1) == '=' && next.charAt(i) == '"' ) {
+					if (next.charAt(i) == '"' && next.charAt(i - 1) == '=') {
 						startIndex = i + 1;
 					}
 					if (next.charAt(i) == '"' && next.charAt(i - 1) != '=') {
