@@ -12,8 +12,6 @@
 */
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +19,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,11 +54,9 @@ public class WikiCrawler {
 	public void crawl() throws IOException, InterruptedException {
 
 		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
-
-		String seedUrlHTML = fetchPage(seedUrl);
 		// If seedUrl does not contain all words from topics, then the graph constructed
 		// is empty graph
-		if (hasTopics(seedUrlHTML)) {
+		if (hasTopics(seedUrl)) {
 
 			// initialize queue and visited and add root to each
 			Queue<String> queue = new LinkedList<String>();
@@ -109,14 +105,31 @@ public class WikiCrawler {
 		HashSet<String> linkz = new HashSet<String>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
+		String href = "href";
+		String dot = ".";
+		String com = ".com";
+		String html = ".html";
 		while (scan.hasNext()) {
 			String next = scan.next();
-			if (next.contains("/wiki/")) {
-				int startIndex = next.indexOf(wiki);
-				int endIndex = next.length() - 1;
+			int startIndex = 0;
+			int endIndex = 0;
+			if (next.contains(wiki) && next.contains(href)) {
+				for (int i = 0; i < next.length(); i++) {
+					if (next.charAt(i - 1) == '=' && next.charAt(i) == '"' ) {
+						startIndex = i + 1;
+					}
+					if (next.charAt(i) == '"' && next.charAt(i - 1) != '=') {
+						endIndex = i;
+						break;
+					}
+				}
 				String possibleLink = next.substring(startIndex, endIndex);
-				if (!possibleLink.contains("#") && !possibleLink.contains(":")) {
-					if (!linkz.contains(possibleLink)) {
+				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !linkz.contains(possibleLink)) {
+					if (possibleLink.contains(dot)) {
+						if (possibleLink.contains(com) || possibleLink.contains(html)) {
+							linkz.add(possibleLink);
+						}
+					} else {
 						linkz.add(possibleLink);
 					}
 				}
@@ -129,7 +142,7 @@ public class WikiCrawler {
 
 	// makes a request to the server to fetch html of the current page and creates a
 	// string for the “actual text component” of the page.
-	private String fetchPage(String currentPage) throws IOException, InterruptedException {
+	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
 		requests++;
 		int mod = requests % 25;
 		if (mod == 0) {
@@ -178,5 +191,6 @@ public class WikiCrawler {
 		ArrayList<String> topics = new ArrayList<String>();
 		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
 		example.crawl();
+		System.out.println("cheese");
 	}
 }
