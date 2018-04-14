@@ -80,6 +80,7 @@ public class WikiCrawler {
 		writeToFile(graph);
 	}
 
+	//checks if the link is within the visited arrayList. 
 	private boolean hasVisited(String link, LinkedList<String> visited) {
 		for (int i = 0; i < visited.size(); i++) {
 			if (visited.get(i).contains(link)) {
