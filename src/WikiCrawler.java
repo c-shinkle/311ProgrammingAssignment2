@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -50,10 +51,11 @@ public class WikiCrawler {
 		this.topics = topics;
 		this.fileName = fileName;
 		foundLinks = new ArrayList<String>();
+		foundLinks.add(seedUrl);
 	}
 
 	public void crawl() throws IOException, InterruptedException {
-		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
+		LinkedHashMap<String, ArrayList<String>> graph = new LinkedHashMap<String, ArrayList<String>>();
 		if (hasTopics(seedUrl)) {
 			Queue<String> queue = new LinkedList<String>();
 			LinkedList<String> visited = new LinkedList<String>();
@@ -68,11 +70,11 @@ public class WikiCrawler {
 					if (!hasVisited(curPageLinks.get(i), visited)) {
 						if (hasTopics(curPageLinks.get(i))) {
 							queue.add(curPageLinks.get(i));
-							pageLinks.add(curPageLinks.get(i));
-							graph.put(curPage, pageLinks);
 						}
 						visited.add(curPageLinks.get(i));
 					}
+					pageLinks.add(curPageLinks.get(i));
+					graph.put(curPage, pageLinks);
 				}
 			}
 		}
@@ -103,7 +105,6 @@ public class WikiCrawler {
 	// returns all of the valid links in the “actual text component” of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML, String url) {
-		foundLinks.add(seedUrl);
 		ArrayList<String> links = new ArrayList<String>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
@@ -126,12 +127,12 @@ public class WikiCrawler {
 				String possibleLink = next.substring(startIndex, endIndex);
 				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org) && !links.contains(possibleLink )
 						&& !possibleLink.equals(url)) {
-						if (foundLinks.size() < max+1) {
+						if (foundLinks.size() < max) {
 							if (!foundLinks.contains(possibleLink)) {
 								foundLinks.add(possibleLink);
 							}
 							links.add(possibleLink);
-						} else if (foundLinks.size() == max+1 && foundLinks.contains(possibleLink)) {
+						} else if (foundLinks.size() == max && foundLinks.contains(possibleLink)) {
 							links.add(possibleLink);
 						}
 					}
@@ -178,12 +179,19 @@ public class WikiCrawler {
 	}
 
 	// Takes the graph and saves it to a file by listing out all of the edges.
-	private void writeToFile(HashMap<String, ArrayList<String>> digraph) throws IOException {
+	private void writeToFile(LinkedHashMap<String, ArrayList<String>> graph) throws IOException {
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
-		printWriter.print(max);
-		for (Map.Entry<String, ArrayList<String>> entry : digraph.entrySet()) {
-			printWriter.print(entry.getKey() + " " + entry.getValue());
+		printWriter.print(foundLinks.size());
+		printWriter.println();
+		for (Map.Entry<String, ArrayList<String>> entry : graph.entrySet()) {
+			String key = entry.getKey();
+		    ArrayList<String> value = entry.getValue();
+		    for(int i=0; i<value.size();i++) {
+		    	String vertice = value.get(i);
+		    	printWriter.print(key + " " + vertice);
+				printWriter.println();
+		    }
 		}
 		printWriter.close();
 	}
