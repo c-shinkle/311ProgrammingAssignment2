@@ -12,6 +12,8 @@
 */
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +21,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -43,6 +45,8 @@ public class WikiCrawler {
 	private int requests;
 
 	public ArrayList<String> findLinksTest;
+	
+	private int numOfCrawls;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
@@ -52,26 +56,37 @@ public class WikiCrawler {
 	}
 
 	public void crawl() throws IOException, InterruptedException {
+
 		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
-		if (hasTopics(seedUrl)) {
+
+		String seedUrlHTML = fetchPage(seedUrl);
+		// If seedUrl does not contain all words from topics, then the graph constructed
+		// is empty graph
+		if (hasTopics(seedUrlHTML)) {
+
+			// initialize queue and visited and add root to each
 			Queue<String> queue = new LinkedList<String>();
 			LinkedList<String> visited = new LinkedList<String>();
 			queue.add(seedUrl);
 			visited.add(seedUrl);
+
 			while (!queue.isEmpty()) {
-				if (visited.size() < max) {
-					String curPage = queue.poll();
-					String curPageHTML = fetchPage(curPage);
-					ArrayList<String> curPageLinks = findLinks(curPageHTML);
-					ArrayList<String> pageLinks = new ArrayList<String>();
+				String curPage = queue.poll();
+				String curPageHTML = fetchPage(curPage);
+				numOfCrawls++;
+				ArrayList<String> curPageLinks = findLinks(curPageHTML);
+				if (numOfCrawls < max) {
 					for (int i = 0; i < curPageLinks.size(); i++) {
-						if (!hasVisited(curPageLinks.get(i), visited)) {
-							if (hasTopics(curPageLinks.get(i))) {
-								queue.add(curPageLinks.get(i));
-								pageLinks.add(curPageLinks.get(i));
-								graph.put(curPage, pageLinks);
+						for (int k = 0; k < visited.size(); k++) {
+							if (!(visited.get(k).contains(curPageLinks.get(i)))) {
+								ArrayList<String> pageLinks = new ArrayList<String>();
+								if (hasTopics(curPageLinks.get(i))) {
+									queue.add(curPageLinks.get(i));
+									pageLinks.add(curPageLinks.get(i));
+									graph.put(curPage, pageLinks);
+								}
+								visited.add(curPageLinks.get(i));
 							}
-							visited.add(curPageLinks.get(i));
 						}
 					}
 				}
@@ -80,17 +95,7 @@ public class WikiCrawler {
 		writeToFile(graph);
 	}
 
-	//checks if the link is within the visited arrayList. 
-	private boolean hasVisited(String link, LinkedList<String> visited) {
-		for (int i = 0; i < visited.size(); i++) {
-			if (visited.get(i).contains(link)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// Checks if the “actual text component” contains all of the topics
+	// Checks if the ï¿½actual text componentï¿½ contains all of the topics
 	private boolean hasTopics(String url) throws IOException, InterruptedException {
 		String subHTML = fetchPage(url);
 		for (int i = 0; i < topics.size(); i++) {
@@ -101,37 +106,20 @@ public class WikiCrawler {
 		return true;
 	}
 
-	// returns all of the valid links in the “actual text component” of the current
+	// returns all of the valid links in the ï¿½actual text componentï¿½ of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML) {
 		HashSet<String> linkz = new HashSet<String>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
-		String href = "href";
-		String dot = ".";
-		String com = ".com";
-		String html = ".html";
 		while (scan.hasNext()) {
 			String next = scan.next();
-			int startIndex = 0;
-			int endIndex = 0;
-			if (next.contains(wiki) && next.contains(href)) {
-				for (int i = 0; i < next.length(); i++) {
-					if (next.charAt(i) == '"' && next.charAt(i - 1) == '=') {
-						startIndex = i + 1;
-					}
-					if (next.charAt(i) == '"' && next.charAt(i - 1) != '=') {
-						endIndex = i;
-						break;
-					}
-				}
+			if (next.contains("/wiki/")) {
+				int startIndex = next.indexOf(wiki);
+				int endIndex = next.length() - 1;
 				String possibleLink = next.substring(startIndex, endIndex);
-				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !linkz.contains(possibleLink)) {
-					if (possibleLink.contains(dot)) {
-						if (possibleLink.contains(com) || possibleLink.contains(html)) {
-							linkz.add(possibleLink);
-						}
-					} else {
+				if (!possibleLink.contains("#") && !possibleLink.contains(":")) {
+					if (!linkz.contains(possibleLink)) {
 						linkz.add(possibleLink);
 					}
 				}
@@ -143,8 +131,8 @@ public class WikiCrawler {
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
-	// string for the “actual text component” of the page.
-	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
+	// string for the ï¿½actual text componentï¿½ of the page.
+	private String fetchPage(String currentPage) throws IOException, InterruptedException {
 		requests++;
 		int mod = requests % 25;
 		if (mod == 0) {
@@ -193,6 +181,5 @@ public class WikiCrawler {
 		ArrayList<String> topics = new ArrayList<String>();
 		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
 		example.crawl();
-		System.out.println("cheese");
 	}
 }
