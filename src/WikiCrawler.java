@@ -42,7 +42,7 @@ private String fileName;
 
 private int requests;
 
-public ArrayList<String> findLinksTest;
+private int totalLinksFound;
 
 public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 	this.max = max;
@@ -59,7 +59,6 @@ public void crawl() throws IOException, InterruptedException {
 		queue.add(seedUrl);
 		visited.add(seedUrl);
 		while (!queue.isEmpty()) {
-			if (visited.size() < max) {
 				String curPage = queue.poll();
 				String curPageHTML = fetchPage(curPage);
 				ArrayList<String> curPageLinks = findLinks(curPageHTML);
@@ -75,7 +74,6 @@ public void crawl() throws IOException, InterruptedException {
 					}
 				}
 			}
-		}
 	}
 	writeToFile(graph);
 }
@@ -104,7 +102,7 @@ private boolean hasTopics(String url) throws IOException, InterruptedException {
 // returns all of the valid links in the “actual text component” of the current
 // page.
 private ArrayList<String> findLinks(String subHTML) {
-	HashSet<String> linkz = new HashSet<String>();
+	ArrayList<String> links = new ArrayList<String>();
 	Scanner scan = new Scanner(subHTML);
 	String wiki = "/wiki/";
 	String href = "href";
@@ -126,19 +124,18 @@ private ArrayList<String> findLinks(String subHTML) {
 				}
 			}
 			String possibleLink = next.substring(startIndex, endIndex);
-			if (!possibleLink.contains("#") && !possibleLink.contains(":") && !linkz.contains(possibleLink)) {
+			if (!possibleLink.contains("#") && !possibleLink.contains(":") && !links.contains(possibleLink)) {
 				if (possibleLink.contains(dot)) {
 					if (possibleLink.contains(com) || possibleLink.contains(html)) {
-						linkz.add(possibleLink);
+						links.add(possibleLink);
 					}
 				} else {
-					linkz.add(possibleLink);
+					links.add(possibleLink);
 				}
 			}
 		}
 	}
 	scan.close();
-	ArrayList<String> links = new ArrayList<String>(linkz);
 	return links;
 }
 
