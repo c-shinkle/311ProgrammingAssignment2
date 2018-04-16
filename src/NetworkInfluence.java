@@ -17,6 +17,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
 
 public class NetworkInfluence {
 
@@ -24,16 +28,26 @@ public class NetworkInfluence {
 
 	// NOTE: graphData is an absolute file path that contains graph data, NOT the
 	// raw graph data itself
-	public NetworkInfluence(String graphData) throws IOException {
-		this.graph = new HashMap<String, ArrayList<String>>();
+	@SuppressWarnings("resource")
+	public NetworkInfluence(String graphData) {
+		graph = new HashMap<String, ArrayList<String>>();
 		File graphFile = new File(graphData);
-		String line;
-		BufferedReader reader = new BufferedReader(new FileReader(graphFile));
-		while ((line = reader.readLine()) != null) {
-			String[] parts = line.split(" ", 2);
+		Scanner reader = null;
+		try {
+			reader = new Scanner(graphFile);
+		} catch (IOException e) {
+			System.out.println("File " + graphData + " was not found.");
+			return;
+		}
+		for (int count = 1; reader.hasNextLine(); count++) {
+			String line = reader.nextLine();
+			String[] parts = line.split(" ");
+			if (parts.length < 2) {
+				throw new RuntimeException("Too few arguements on line: " + count);
+			}
 			String key = parts[0];
 			String value = parts[1];
-			if (graph == null || !graph.containsKey(key)) {
+			if (!graph.containsKey(key)) {
 				ArrayList<String> edges = new ArrayList<String>();
 				edges.add(value);
 				graph.put(key, edges);
@@ -42,7 +56,6 @@ public class NetworkInfluence {
 				ArrayList<String> edges2 = graph.get(key);
 				if(!edges2.contains(value)) {
 					edges2.add(value);
-					graph.put(key, edges2);
 				}
 			}
 		}
@@ -50,17 +63,35 @@ public class NetworkInfluence {
 	}
 
 	public int outDegree(String v) {
-		// implementation
-
-		// replace this:
+		if (graph.get(v) != null)
+			return graph.get(v).size();
 		return -1;
 	}
 
 	public ArrayList<String> shortestPath(String u, String v) {
-		// implementation
-
-		// replace this:
-		return null;
+		ArrayList<String> result = new ArrayList<>();
+		Queue<String> q = new LinkedList<String>();
+		HashSet<String> visited = new HashSet<>();
+		
+		visited.add(u);
+		q.offer(u);
+		
+		while(!q.isEmpty()) {
+			String current = q.poll();
+			if (current.equals(v)) {
+				//TODO
+			}
+			
+			visited.add(current);
+			
+			ArrayList<String> outVertices = graph.get(current);
+			for (String s : outVertices) {
+				if (!visited.contains(s)) {
+					q.add(s);
+				}
+			}
+		}
+		return result;
 	}
 
 	public int distance(String u, String v) {
