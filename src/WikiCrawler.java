@@ -30,38 +30,38 @@ import java.util.Scanner;
 
 public class WikiCrawler {
 
-public static final String BASE_URL = "https://en.wikipedia.org";
+	public static final String BASE_URL = "https://en.wikipedia.org";
 
-private int max;
+	private int max;
 
-private String seedUrl;
+	private String seedUrl;
 
-private ArrayList<String> topics;
+	private ArrayList<String> topics;
 
-private String fileName;
+	private String fileName;
 
-private int requests;
+	private int requests;
 
-private int totalLinksFound;
+	private int foundLinks;
 
-public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
-	this.max = max;
-	this.seedUrl = seedUrl;
-	this.topics = topics;
-	this.fileName = fileName;
-}
+	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
+		this.max = max;
+		this.seedUrl = seedUrl;
+		this.topics = topics;
+		this.fileName = fileName;
+	}
 
-public void crawl() throws IOException, InterruptedException {
-	HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
-	if (hasTopics(seedUrl)) {
-		Queue<String> queue = new LinkedList<String>();
-		LinkedList<String> visited = new LinkedList<String>();
-		queue.add(seedUrl);
-		visited.add(seedUrl);
-		while (!queue.isEmpty()) {
+	public void crawl() throws IOException, InterruptedException {
+		HashMap<String, ArrayList<String>> graph = new HashMap<String, ArrayList<String>>();
+		if (hasTopics(seedUrl)) {
+			Queue<String> queue = new LinkedList<String>();
+			LinkedList<String> visited = new LinkedList<String>();
+			queue.add(seedUrl);
+			visited.add(seedUrl);
+			while (!queue.isEmpty()) {
 				String curPage = queue.poll();
 				String curPageHTML = fetchPage(curPage);
-				ArrayList<String> curPageLinks = findLinks(curPageHTML);
+				ArrayList<String> curPageLinks = findLinks(curPageHTML, curPage);
 				ArrayList<String> pageLinks = new ArrayList<String>();
 				for (int i = 0; i < curPageLinks.size(); i++) {
 					if (!hasVisited(curPageLinks.get(i), visited)) {
@@ -74,122 +74,124 @@ public void crawl() throws IOException, InterruptedException {
 					}
 				}
 			}
-	}
-	writeToFile(graph);
-}
-
-//checks if the link is within the visited arrayList. 
-private boolean hasVisited(String link, LinkedList<String> visited) {
-	for (int i = 0; i < visited.size(); i++) {
-		if (visited.get(i).contains(link)) {
-			return true;
 		}
+		writeToFile(graph);
 	}
-	return false;
-}
 
-// Checks if the “actual text component” contains all of the topics
-private boolean hasTopics(String url) throws IOException, InterruptedException {
-	String subHTML = fetchPage(url);
-	for (int i = 0; i < topics.size(); i++) {
-		if (!subHTML.toLowerCase().contains(topics.get(i).toLowerCase())) {
-			return false;
-		}
-	}
-	return true;
-}
-
-// returns all of the valid links in the “actual text component” of the current
-// page.
-private ArrayList<String> findLinks(String subHTML) {
-	ArrayList<String> links = new ArrayList<String>();
-	Scanner scan = new Scanner(subHTML);
-	String wiki = "/wiki/";
-	String href = "href";
-	String dot = ".";
-	String com = ".com";
-	String html = ".html";
-	while (scan.hasNext()) {
-		String next = scan.next();
-		int startIndex = 0;
-		int endIndex = 0;
-		if (next.contains(wiki) && next.contains(href)) {
-			for (int i = 0; i < next.length(); i++) {
-				if (next.charAt(i) == '"' && next.charAt(i - 1) == '=') {
-					startIndex = i + 1;
-				}
-				if (next.charAt(i) == '"' && next.charAt(i - 1) != '=') {
-					endIndex = i;
-					break;
-				}
+	// checks if the link is within the visited arrayList.
+	private boolean hasVisited(String link, LinkedList<String> visited) {
+		for (int i = 0; i < visited.size(); i++) {
+			if (visited.get(i).equals(link)) {
+				return true;
 			}
-			String possibleLink = next.substring(startIndex, endIndex);
-			if (!possibleLink.contains("#") && !possibleLink.contains(":") && !links.contains(possibleLink)) {
-				if (possibleLink.contains(dot)) {
-					if (possibleLink.contains(com) || possibleLink.contains(html)) {
+		}
+		return false;
+	}
+
+	// Checks if the “actual text component” contains all of the topics
+	private boolean hasTopics(String url) throws IOException, InterruptedException {
+		String subHTML = fetchPage(url);
+		for (int i = 0; i < topics.size(); i++) {
+			if (!subHTML.toLowerCase().contains(topics.get(i).toLowerCase())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	// returns all of the valid links in the “actual text component” of the current
+	// page.
+	private ArrayList<String> findLinks(String subHTML, String url) {
+		ArrayList<String> links = new ArrayList<String>();
+		Scanner scan = new Scanner(subHTML);
+		String wiki = "/wiki/";
+		String href = "href";
+		String dot = ".";
+		String com = ".com";
+		String html = ".html";
+		while (scan.hasNext()) {
+			String next = scan.next();
+			int startIndex = 0;
+			int endIndex = 0;
+			if (next.contains(wiki) && next.contains(href)) {
+				for (int i = 0; i < next.length(); i++) {
+					if (next.charAt(i) == '"' && next.charAt(i - 1) == '=') {
+						startIndex = i + 1;
+					}
+					if (next.charAt(i) == '"' && next.charAt(i - 1) != '=') {
+						endIndex = i;
+						break;
+					}
+				}
+				String possibleLink = next.substring(startIndex, endIndex);
+				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !links.contains(possibleLink)
+						&& !possibleLink.equals(url)) {
+					if (possibleLink.contains(dot)) {
+						if (possibleLink.contains(com) || possibleLink.contains(html)) {
+							links.add(possibleLink);
+
+						}
+					} else {
 						links.add(possibleLink);
 					}
-				} else {
-					links.add(possibleLink);
 				}
 			}
 		}
+		scan.close();
+		return links;
 	}
-	scan.close();
-	return links;
-}
 
-// makes a request to the server to fetch html of the current page and creates a
-// string for the “actual text component” of the page.
-private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
-	requests++;
-	int mod = requests % 25;
-	if (mod == 0) {
-		Thread.sleep(3000);
-	}
-	URL url = null;
-	InputStream is = null;
-	try {
-		url = new URL(BASE_URL + currentPage);
-		is = url.openStream();
-	} catch (MalformedURLException e) {
-		e.printStackTrace();
-		return null;
-	} catch (IOException e) {
-		e.printStackTrace();
-		return null;
-	}
-	BufferedReader br = new BufferedReader(new InputStreamReader(is));
-	String input;
-	StringBuilder builder = new StringBuilder();
-	while ((input = br.readLine()) != null) {
-		builder.append(input);
-	}
-	br.close();
-	String HTML = builder.toString();
+	// makes a request to the server to fetch html of the current page and creates a
+	// string for the “actual text component” of the page.
+	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
+		requests++;
+		int mod = requests % 25;
+		if (mod == 0) {
+			Thread.sleep(3000);
+		}
+		URL url = null;
+		InputStream is = null;
+		try {
+			url = new URL(BASE_URL + currentPage);
+			is = url.openStream();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String input;
+		StringBuilder builder = new StringBuilder();
+		while ((input = br.readLine()) != null) {
+			builder.append(input);
+		}
+		br.close();
+		String HTML = builder.toString();
 
-	// Create subString starting after first <p>
-	String p1 = "<p>";
-	int startIndex = HTML.indexOf(p1);
-	String subHTML = HTML.substring(startIndex, HTML.length());
-	return subHTML;
-}
-
-// Takes the graph and saves it to a file by listing out all of the edges.
-private void writeToFile(HashMap<String, ArrayList<String>> digraph) throws IOException {
-	FileWriter fileWriter = new FileWriter(fileName);
-	PrintWriter printWriter = new PrintWriter(fileWriter);
-	printWriter.print(max);
-	for (Map.Entry<String, ArrayList<String>> entry : digraph.entrySet()) {
-		printWriter.print(entry.getKey() + " " + entry.getValue());
+		// Create subString starting after first <p>
+		String p1 = "<p>";
+		int startIndex = HTML.indexOf(p1);
+		String subHTML = HTML.substring(startIndex, HTML.length());
+		return subHTML;
 	}
-	printWriter.close();
-}
 
-public static void main(String[] args) throws IOException, InterruptedException {
-	ArrayList<String> topics = new ArrayList<String>();
-	WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
-	example.crawl();
-	System.out.println("cheese");
-}
+	// Takes the graph and saves it to a file by listing out all of the edges.
+	private void writeToFile(HashMap<String, ArrayList<String>> digraph) throws IOException {
+		FileWriter fileWriter = new FileWriter(fileName);
+		PrintWriter printWriter = new PrintWriter(fileWriter);
+		printWriter.print(max);
+		for (Map.Entry<String, ArrayList<String>> entry : digraph.entrySet()) {
+			printWriter.print(entry.getKey() + " " + entry.getValue());
+		}
+		printWriter.close();
+	}
+
+	public static void main(String[] args) throws IOException, InterruptedException {
+		ArrayList<String> topics = new ArrayList<String>();
+		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
+		example.crawl();
+		System.out.println("cheese");
+	}
 }
