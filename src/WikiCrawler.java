@@ -95,7 +95,20 @@ public class WikiCrawler {
 		writeToFile(graph);
 	}
 
+<<<<<<< HEAD
 	// Checks if the ï¿½actual text componentï¿½ contains all of the topics
+=======
+	private boolean hasVisited(String link, LinkedList<String> visited) {
+		for (int i = 0; i < visited.size(); i++) {
+			if (visited.get(i).contains(link)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Checks if the “actual text component” contains all of the topics
+>>>>>>> parent of b196b94... .
 	private boolean hasTopics(String url) throws IOException, InterruptedException {
 		String subHTML = fetchPage(url);
 		for (int i = 0; i < topics.size(); i++) {
