@@ -42,13 +42,14 @@ public class WikiCrawler {
 
 	private int requests;
 
-	private int foundLinks;
+	private ArrayList<String> foundLinks;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
 		this.seedUrl = seedUrl;
 		this.topics = topics;
 		this.fileName = fileName;
+		foundLinks = new ArrayList<String>();
 	}
 
 	public void crawl() throws IOException, InterruptedException {
@@ -102,13 +103,12 @@ public class WikiCrawler {
 	// returns all of the valid links in the “actual text component” of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML, String url) {
+		foundLinks.add(seedUrl);
 		ArrayList<String> links = new ArrayList<String>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
 		String href = "href";
-		String dot = ".";
-		String com = ".com";
-		String html = ".html";
+		String org = ".org";
 		while (scan.hasNext()) {
 			String next = scan.next();
 			int startIndex = 0;
@@ -124,19 +124,19 @@ public class WikiCrawler {
 					}
 				}
 				String possibleLink = next.substring(startIndex, endIndex);
-				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !links.contains(possibleLink)
+				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org) && !links.contains(possibleLink )
 						&& !possibleLink.equals(url)) {
-					if (possibleLink.contains(dot)) {
-						if (possibleLink.contains(com) || possibleLink.contains(html)) {
+						if (foundLinks.size() < max+1) {
+							if (!foundLinks.contains(possibleLink)) {
+								foundLinks.add(possibleLink);
+							}
 							links.add(possibleLink);
-
+						} else if (foundLinks.size() == max+1 && foundLinks.contains(possibleLink)) {
+							links.add(possibleLink);
 						}
-					} else {
-						links.add(possibleLink);
 					}
 				}
 			}
-		}
 		scan.close();
 		return links;
 	}
