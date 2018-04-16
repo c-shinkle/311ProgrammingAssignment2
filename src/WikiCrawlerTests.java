@@ -1,12 +1,16 @@
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Scanner;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class WikiCrawlerTests {
+public class WikiCrawlerTests {
 
 	ArrayList<String> empty = new ArrayList<String>();
 	ArrayList<String> ISUtopics = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
