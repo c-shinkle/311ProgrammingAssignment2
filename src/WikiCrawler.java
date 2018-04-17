@@ -37,7 +37,7 @@ public class WikiCrawler {
 
 	private String seedUrl;
 
-	private ArrayList<String> topics;
+	ArrayList<String> topics;
 
 	private String fileName;
 
