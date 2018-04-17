@@ -105,6 +105,7 @@ public class NetworkInfluence {
 
 	public ArrayList<String> shortestPath(String u, String v) {
 		ArrayList<String> result = new ArrayList<>();
+		ArrayList<String> outVertices;
 		PriorityQueue<Tuple> q = new PriorityQueue<Tuple>();
 		HashMap<String, Tuple> dist = new HashMap<>();
 		HashMap<String, String> prev = new HashMap<>();
@@ -129,6 +130,9 @@ public class NetworkInfluence {
 				continue;
 			}
 			
+			//Mark the vertex as visited
+			visited.replace(current.string, true);
+			
 			// If we find the node we're looking for,
 			// we can stop early.
 			if (current.string.equals(v)) {
@@ -136,7 +140,7 @@ public class NetworkInfluence {
 				return result;
 			}
 			
-			ArrayList<String> outVertices = graph.get(current.string);
+			outVertices = graph.get(current.string);
 			if (outVertices == null)
 				continue;
 			
@@ -155,8 +159,7 @@ public class NetworkInfluence {
 					q.add(new Tuple(s, alt));
 				}
 			}
-			//Mark the vertex as visited
-			visited.replace(current.string, true);
+			
 		}
 		return result;
 	}
