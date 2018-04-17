@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -182,10 +183,22 @@ public class NetworkInfluence {
 	}
 
 	public ArrayList<String> mostInfluentialDegree(int k) {
-		// implementation
-
-		// replace this:
-		return null;
+		ArrayList<String> list = new ArrayList<String>();
+		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k, new Comparator<Integer>() {
+		    public int compare(Integer lhs, Integer rhs) {
+		        if (lhs > rhs) return 1;
+		        if (lhs.equals(rhs)) return 0;
+		        return -1;
+		    }
+		});
+		for(int i=0; i<masterList.length;i++) {
+			int element = outDegree(masterList[i]);
+			pq.add(element);
+		}
+		for(int i=0; i<k;i++) {
+			
+		}
+		return list;
 	}
 
 	public ArrayList<String> mostInfluentialModular(int k) {
