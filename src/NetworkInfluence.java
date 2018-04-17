@@ -136,8 +136,6 @@ public class NetworkInfluence {
 				return result;
 			}
 			
-			
-			
 			ArrayList<String> outVertices = graph.get(current.string);
 			if (outVertices == null)
 				continue;
