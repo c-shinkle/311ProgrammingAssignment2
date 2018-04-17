@@ -32,7 +32,8 @@ public class NetworkInfluence {
 
 	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
-
+	int influenceCounter = 0;
+	float influenceNumber = 0;
 	// NOTE: graphData is an absolute file path that contains graph data, NOT
 	// the
 	// raw graph data itself
@@ -198,11 +199,31 @@ public class NetworkInfluence {
 
 	public float influence(String u) {
 		// implementation
-
-		// replace this:
-		return -1f;
+		
+		int size = 0;
+		
+		if(graph.get(u)==null){
+			return 1/(powerFunction(influenceCounter));
+		}
+		else{
+			int i = 0;
+			size= graph.get(u).size();
+			while(i<size){
+				influenceNumber +=influence(graph.get(u).get(i));
+				i++;
+				influenceCounter ++;
+			}
+			
+		}
+		return influenceNumber;
 	}
-
+	public int powerFunction(int pow){
+		int total = 1;
+			for(int i =0; i<pow;i++){
+				total = total*2;
+		}
+		return total;
+	}
 	public float influence(ArrayList<String> s) {
 		// implementation
 
