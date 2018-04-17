@@ -1,17 +1,21 @@
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Scanner;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class WikiCrawlerTests {
+public class WikiCrawlerTests {
 
 	ArrayList<String> empty = new ArrayList<String>();
 	ArrayList<String> ISUtopics = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
 	
-	WikiCrawler complexityTheory = new WikiCrawler("/wiki/Complexity_theory", 20, empty, "wikiCC.txt");
+	WikiCrawler complexityTheory = new WikiCrawler("/wiki/Complexity_theory", 20, empty, "Test.txt");
 	WikiCrawler iowaState = new WikiCrawler("/wiki/Iowa_State_University", 100, ISUtopics, "WikiISU.txt");
 	WikiCrawler comScience = new WikiCrawler("/wiki/Computer Science", 100, empty, "WikiISU.txt");
 	
@@ -20,24 +24,24 @@ class WikiCrawlerTests {
 	//Test for findLinks helper method
 	
 	@Test
-	void findLinks1() throws IOException, InterruptedException {
+	public void findLinks1() throws IOException, InterruptedException {
 		complexityTheory.crawl();
-		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = complexityTheory.findLinksTest;
+		ArrayList<String> expected = new ArrayList<String>();
+		ArrayList<String> actual = complexityTheory.topics;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void findLinks2() throws IOException, InterruptedException {
+	public void findLinks2() throws IOException, InterruptedException {
 		iowaState.crawl();
 		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = iowaState.findLinksTest;
+		ArrayList<String> actual = iowaState.topics;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void findLinks3() throws IOException, InterruptedException {
+	public void findLinks3() throws IOException, InterruptedException {
 		comScience.crawl();
-		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = comScience.findLinksTest;
+		ArrayList<String> expected = new ArrayList<String>();
+		ArrayList<String> actual = comScience.topics;
 		assertEquals(expected,actual);
 	}
 	
@@ -45,20 +49,20 @@ class WikiCrawlerTests {
 	//Tests for hasTopics helper method
 	
 	@Test
-	void hasTopics1() throws IOException, InterruptedException {
+	public void hasTopics1() throws IOException, InterruptedException {
 		String expected = null;
 		String actual = null;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void hasTopics2() throws IOException, InterruptedException {
+	public void hasTopics2() throws IOException, InterruptedException {
 		iowaState.crawl();
 		ArrayList<String> expected = null;
 		ArrayList<String> actual = null;
 		assertEquals(expected,actual);
 	}
 	@Test
-	void hasTopics3() throws IOException, InterruptedException {
+	public void hasTopics3() throws IOException, InterruptedException {
 		comScience.crawl();
 		ArrayList<String> expected = null;
 		ArrayList<String> actual = null;
@@ -69,74 +73,74 @@ class WikiCrawlerTests {
 	//Tests for fetchPage helper method
 	
 	
-	@Test
-	void fetchPage1() throws IOException, InterruptedException {
-		complexityTheory.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void fetchPage2() throws IOException, InterruptedException {
-		iowaState.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void fetchPage3() throws IOException, InterruptedException {
-		comScience.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	
-	
-	
-	// Tests for Crawl method
-	
-	
-	@Test
-	void Crawl1() throws IOException, InterruptedException {
-		complexityTheory.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void Crawl2() throws IOException, InterruptedException {
-		complexityTheory.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void Crawl3() throws IOException, InterruptedException {
-		iowaState.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void Crawl4() throws IOException, InterruptedException {
-		iowaState.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void Crawl5() throws IOException, InterruptedException {
-		comScience.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	void Crawl6() throws IOException, InterruptedException {
-		comScience.crawl();
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
+//	@Test
+//	public void fetchPage1() throws IOException, InterruptedException {
+//		complexityTheory.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void fetchPage2() throws IOException, InterruptedException {
+//		iowaState.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void fetchPage3() throws IOException, InterruptedException {
+//		comScience.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	
+//	
+//	
+//	// Tests for Crawl method
+//	
+//	
+//	@Test
+//	public void Crawl1() throws IOException, InterruptedException {
+//		complexityTheory.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void Crawl2() throws IOException, InterruptedException {
+//		complexityTheory.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void Crawl3() throws IOException, InterruptedException {
+//		iowaState.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void Crawl4() throws IOException, InterruptedException {
+//		iowaState.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void Crawl5() throws IOException, InterruptedException {
+//		comScience.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void Crawl6() throws IOException, InterruptedException {
+//		comScience.crawl();
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
 
 }

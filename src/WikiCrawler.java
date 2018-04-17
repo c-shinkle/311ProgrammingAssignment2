@@ -37,7 +37,7 @@ public class WikiCrawler {
 
 	private String seedUrl;
 
-	private ArrayList<String> topics;
+	ArrayList<String> topics;
 
 	private String fileName;
 
@@ -91,7 +91,7 @@ public class WikiCrawler {
 		return false;
 	}
 
-	// Checks if the “actual text component” contains all of the topics
+	// Checks if the ï¿½actual text componentï¿½ contains all of the topics
 	private boolean hasTopics(String url) throws IOException, InterruptedException {
 		String subHTML = fetchPage(url);
 		for (int i = 0; i < topics.size(); i++) {
@@ -102,7 +102,7 @@ public class WikiCrawler {
 		return true;
 	}
 
-	// returns all of the valid links in the “actual text component” of the current
+	// returns all of the valid links in the ï¿½actual text componentï¿½ of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML, String url) {
 		ArrayList<String> links = new ArrayList<String>();
@@ -143,7 +143,7 @@ public class WikiCrawler {
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
-	// string for the “actual text component” of the page.
+	// string for the ï¿½actual text componentï¿½ of the page.
 	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
 		requests++;
 		int mod = requests % 25;
@@ -180,10 +180,9 @@ public class WikiCrawler {
 
 	// Takes the graph and saves it to a file by listing out all of the edges.
 	private void writeToFile(LinkedHashMap<String, ArrayList<String>> graph) throws IOException {
-		FileWriter fileWriter = new FileWriter(fileName);
-		PrintWriter printWriter = new PrintWriter(fileWriter);
-		printWriter.print(foundLinks.size());
-		printWriter.println();
+		System.out.println(fileName);
+		PrintWriter printWriter = new PrintWriter(fileName,"UTF-8");
+		printWriter.println(foundLinks.size());
 		for (Map.Entry<String, ArrayList<String>> entry : graph.entrySet()) {
 			String key = entry.getKey();
 		    ArrayList<String> value = entry.getValue();
@@ -198,7 +197,7 @@ public class WikiCrawler {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		ArrayList<String> topics = new ArrayList<String>();
-		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "wikiCC.txt");
+		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "Test.txt");
 		example.crawl();
 		System.out.println("cheese");
 	}
