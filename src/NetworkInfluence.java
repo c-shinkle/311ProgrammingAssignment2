@@ -105,26 +105,25 @@ public class NetworkInfluence {
 
 	public ArrayList<String> shortestPath(String u, String v) {
 		ArrayList<String> result = new ArrayList<>();
-		PriorityQueue<String> q = new PriorityQueue<String>();
-		HashMap<String, String> visited = new HashMap<>();
+		PriorityQueue<Tuple> q = new PriorityQueue<Tuple>();
 		HashMap<String, Integer> dist = new HashMap<>(); 
 		HashMap<String, String> prev = new HashMap<>();
 		
 		dist.put(u, 0);
-		q.add(u);
+		q.add(new Tuple(u, 0));
 		
 		for (String s : masterList) {
 			if (!s.equals(u)) {
 				dist.put(s, Integer.MAX_VALUE);
-				q.add(s);
+				q.add(new Tuple(s, Integer.MAX_VALUE));
 			}
 		}
 		
 		while(!q.isEmpty()) {
-			String current = q.poll();
+			Tuple current = q.poll();
 			if (current.equals(v)) {
 				Stack<String> stack = new Stack<String>();
-				String s = current;
+				String s = current.string;
 				
 				while (s != null) {
 					stack.push(s);
@@ -138,14 +137,13 @@ public class NetworkInfluence {
 				return result;
 			}
 			
-			visited.put(current, current);
-			
 			ArrayList<String> outVertices = graph.get(current);
 			for (String s : outVertices) {
 				int alt = dist.get(current) + 1;
 				if (alt < dist.get(s)) {
 					dist.put(s, alt);
-					prev.put(s, current);
+					prev.put(s, current.string);
+					q.add(new Tuple(s, alt));
 				}
 			}
 		}
@@ -203,7 +201,30 @@ public class NetworkInfluence {
 		// replace this:
 		return null;
 	}
+	
+	private class Tuple implements Comparable<Tuple>{
+		
+		String string;
+		int dist;
+		
+		public Tuple(String s, int i) {
+			string = s;
+			dist = i;
+		}
 
+		@Override
+		public int compareTo(Tuple other) {
+			if (this.dist < other.dist)
+				return -1;
+			else if (this.dist > other.dist)
+				return 1;
+			else 
+				return 0;
+		}
+		
+		
+	}
+	
 	public static void main(String[] args) throws IOException {
 		NetworkInfluence example2 = new NetworkInfluence("wikiCC.txt");
 		example2.outDegree(null);
