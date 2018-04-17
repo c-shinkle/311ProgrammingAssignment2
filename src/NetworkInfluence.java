@@ -18,12 +18,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.Stack;
 
 public class NetworkInfluence {
-
+	
+	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
 
 	// NOTE: graphData is an absolute file path that contains graph data, NOT the
@@ -39,7 +45,12 @@ public class NetworkInfluence {
 			System.out.println("File " + graphData + " was not found.");
 			return;
 		}
-		for (int count = 1; reader.hasNextLine(); count++) {
+		
+		String tmp = reader.nextLine();
+		int size = Integer.parseInt(tmp);
+		masterList = new String[size];
+		
+		for (int count = 1, index = 0; reader.hasNextLine(); count++) {
 			String line = reader.nextLine();
 			String[] parts = line.split(" ");
 			if (parts.length < 2) {
@@ -58,6 +69,13 @@ public class NetworkInfluence {
 					edges2.add(value);
 				}
 			}
+			
+//			if (!graph)
+//			
+//			if (!graph.containsKey(value)) {
+//				masterList[index++] = value;
+//			}
+			
 		}
 		reader.close();
 	}
@@ -70,24 +88,49 @@ public class NetworkInfluence {
 
 	public ArrayList<String> shortestPath(String u, String v) {
 		ArrayList<String> result = new ArrayList<>();
-		Queue<String> q = new LinkedList<String>();
-		HashSet<String> visited = new HashSet<>();
+		PriorityQueue<String> q = new PriorityQueue<String>();
+		HashMap<String, String> visited = new HashMap<>();
+		HashMap<String, Integer> dist = new HashMap<>(); 
+		HashMap<String, String> prev = new HashMap<>();
 		
-		visited.add(u);
-		q.offer(u);
+		dist.put(u, 0);
+		
+		Set<Entry<String, ArrayList<String>>> set =  graph.entrySet();
+		for (Entry<String, ArrayList<String>> e : set) {
+			if (!e.getKey().equals(u)) {
+				dist.put(e.getKey(), Integer.MAX_VALUE);
+				//
+			}
+		}
+		
+		q.add(u);
 		
 		while(!q.isEmpty()) {
 			String current = q.poll();
 			if (current.equals(v)) {
-				//TODO
+				Stack<String> stack = new Stack<String>();
+				String s = current;
+				
+				while (s != null) {
+					stack.push(s);
+					s = prev.get(s);
+				}
+				
+				while (!stack.isEmpty()) {
+					result.add(stack.pop());
+				}
+				
+				return result;
 			}
 			
-			visited.add(current);
+			visited.put(current, current);
 			
 			ArrayList<String> outVertices = graph.get(current);
 			for (String s : outVertices) {
-				if (!visited.contains(s)) {
-					q.add(s);
+				int alt = dist.get(s) + 1;
+				if (alt < dist.get(s)) {
+					dist.put(s, alt);
+					prev.put(s, s);
 				}
 			}
 		}
