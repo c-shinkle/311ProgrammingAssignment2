@@ -32,8 +32,6 @@ public class NetworkInfluence {
 
 	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
-	int influenceCounter = 0;
-	float influenceNumber = 0;
 	// NOTE: graphData is an absolute file path that contains graph data, NOT
 	// the
 	// raw graph data itself
@@ -101,7 +99,7 @@ public class NetworkInfluence {
 	public int outDegree(String v) {
 		if (graph.get(v) != null)
 			return graph.get(v).size();
-		return -1;
+		return 0;
 	}
 
 	public ArrayList<String> shortestPath(String u, String v) {
@@ -198,24 +196,28 @@ public class NetworkInfluence {
 	}
 
 	public float influence(String u) {
-		// implementation
-		
-		int size = 0;
-		
-		if(graph.get(u)==null){
-			return 1/(powerFunction(influenceCounter));
+		String[] temp = new String[masterList.length];
+		for(int i = 0;i<temp.length;i++){
+			temp[i]= masterList[i];
 		}
-		else{
-			int i = 0;
-			size= graph.get(u).size();
-			while(i<size){
-				influenceNumber +=influence(graph.get(u).get(i));
-				i++;
-				influenceCounter ++;
-			}
+		return influenceHelper(u, 0, temp);
+		
+	
+	}
+	private float influenceHelper(String u, int layer, String[] arr){
+	int size = outDegree(u);
+		if(size == 0){
+			return (float) (1.0/powerFunction(layer));
+		}
+		int i = 0;
+		float influenceTotal = (float) 1.0/powerFunction(layer);
+
+		while(i<size){
+			influenceTotal +=influenceHelper(graph.get(u).get(i),layer+1,arr);	
+			i++;
 			
 		}
-		return influenceNumber;
+		return influenceTotal;
 	}
 	public int powerFunction(int pow){
 		int total = 1;
