@@ -283,7 +283,7 @@ public class NetworkInfluence {
 
 		// do the loop k times
 		for (int x = 0; x < k; x++) {
-			
+
 			PriorityQueue<Tuple3> pq = new PriorityQueue<Tuple3>(k, new Comparator<Tuple3>() {
 				public int compare(Tuple3 lhs, Tuple3 rhs) {
 					if (lhs.dist < rhs.dist)
@@ -296,11 +296,11 @@ public class NetworkInfluence {
 			for (int i = 0; i < masterTemp.length; i++) {
 				ArrayList<String> vList = list;
 				vList.add(masterTemp[i]);
-				Tuple3 vInf = new Tuple3(masterTemp[i],influence(vList),i);
+				Tuple3 vInf = new Tuple3(masterTemp[i], influence(vList), i);
 				pq.add(vInf);
-				
+
 			}
-			
+
 			// add found vertice to the list and remove it from masterTemp.
 			Tuple3 vertice = pq.poll();
 			String s = vertice.string;
@@ -366,13 +366,14 @@ public class NetworkInfluence {
 		}
 
 	}
+
 	private class Tuple3 implements Comparable<Tuple3> {
 
 		String string;
 		float dist;
 		int index;
 
-		public Tuple3(String s, float i,int in) {
+		public Tuple3(String s, float i, int in) {
 			string = s;
 			dist = i;
 			index = in;
@@ -401,4 +402,3 @@ public class NetworkInfluence {
 		example2.outDegree(null);
 	}
 }
-
