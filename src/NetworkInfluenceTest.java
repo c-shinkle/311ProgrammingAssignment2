@@ -18,11 +18,20 @@ public class NetworkInfluenceTest {
 	
 	@Test
 	public void testAShortestPath() {
-		ArrayList<String> actual = new ArrayList<>();
-		actual.add("A");
-		actual.add("D");
-		ArrayList<String> expected = A.shortestPath("A", "D");
-		assertEquals(actual, expected);
+		ArrayList<String> expected = new ArrayList<>();
+		expected.add("A");
+		expected.add("D");
+		ArrayList<String> actual = A.shortestPath("A", "D");
+		assertEquals(expected, actual);
 	}
 	
+	@Test
+	public void testBShortestPath() {
+		ArrayList<String> expected = new ArrayList<>();
+		expected.add("A");
+		expected.add("E");
+		expected.add("D");
+		ArrayList<String> actual = B.shortestPath("A", "D");
+		assertEquals(expected, actual);
+	}
 }
