@@ -73,8 +73,10 @@ public class WikiCrawler {
 						}
 						visited.add(curPageLinks.get(i));
 					}
-					pageLinks.add(curPageLinks.get(i));
-					graph.put(curPage, pageLinks);
+					if (hasTopics(curPageLinks.get(i))) {
+						pageLinks.add(curPageLinks.get(i));
+						graph.put(curPage, pageLinks);
+					}
 				}
 			}
 		}
@@ -91,7 +93,7 @@ public class WikiCrawler {
 		return false;
 	}
 
-	// Checks if the “actual text component” contains all of the topics
+	// Checks if the ï¿½actual text componentï¿½ contains all of the topics
 	private boolean hasTopics(String url) throws IOException, InterruptedException {
 		String subHTML = fetchPage(url);
 		for (int i = 0; i < topics.size(); i++) {
@@ -102,7 +104,7 @@ public class WikiCrawler {
 		return true;
 	}
 
-	// returns all of the valid links in the “actual text component” of the current
+	// returns all of the valid links in the ï¿½actual text componentï¿½ of the current
 	// page.
 	private ArrayList<String> findLinks(String subHTML, String url) {
 		ArrayList<String> links = new ArrayList<String>();
@@ -125,25 +127,25 @@ public class WikiCrawler {
 					}
 				}
 				String possibleLink = next.substring(startIndex, endIndex);
-				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org) && !links.contains(possibleLink )
-						&& !possibleLink.equals(url)) {
-						if (foundLinks.size() < max) {
-							if (!foundLinks.contains(possibleLink)) {
-								foundLinks.add(possibleLink);
-							}
-							links.add(possibleLink);
-						} else if (foundLinks.size() == max && foundLinks.contains(possibleLink)) {
-							links.add(possibleLink);
+				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org)
+						&& !links.contains(possibleLink) && !possibleLink.equals(url)) {
+					if (foundLinks.size() < max) {
+						if (!foundLinks.contains(possibleLink)) {
+							foundLinks.add(possibleLink);
 						}
+						links.add(possibleLink);
+					} else if (foundLinks.size() == max && foundLinks.contains(possibleLink)) {
+						links.add(possibleLink);
 					}
 				}
 			}
+		}
 		scan.close();
 		return links;
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
-	// string for the “actual text component” of the page.
+	// string for the ï¿½actual text componentï¿½ of the page.
 	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
 		requests++;
 		int mod = requests % 25;
@@ -186,12 +188,12 @@ public class WikiCrawler {
 		printWriter.println();
 		for (Map.Entry<String, ArrayList<String>> entry : graph.entrySet()) {
 			String key = entry.getKey();
-		    ArrayList<String> value = entry.getValue();
-		    for(int i=0; i<value.size();i++) {
-		    	String vertice = value.get(i);
-		    	printWriter.print(key + " " + vertice);
+			ArrayList<String> value = entry.getValue();
+			for (int i = 0; i < value.size(); i++) {
+				String vertice = value.get(i);
+				printWriter.print(key + " " + vertice);
 				printWriter.println();
-		    }
+			}
 		}
 		printWriter.close();
 	}
