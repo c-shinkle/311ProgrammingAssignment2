@@ -32,6 +32,8 @@ public class NetworkInfluence {
 
 	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
+	int influenceCounter = 0;
+	float influenceNumber = 0;
 
 	// NOTE: graphData is an absolute file path that contains graph data, NOT
 	// the
@@ -100,7 +102,7 @@ public class NetworkInfluence {
 	public int outDegree(String v) {
 		if (graph.get(v) != null)
 			return graph.get(v).size();
-		return 0;
+		return -1;
 	}
 
 	public ArrayList<String> shortestPath(String u, String v) {
@@ -110,7 +112,7 @@ public class NetworkInfluence {
 		HashMap<String, Tuple> dist = new HashMap<>();
 		HashMap<String, String> prev = new HashMap<>();
 		HashMap<String, Boolean> visited = new HashMap<>();
-		
+
 		q.add(new Tuple(u, 0));
 
 		for (String s : masterList) {
@@ -122,28 +124,28 @@ public class NetworkInfluence {
 			}
 		}
 
-		for (Tuple current = q.poll();!q.isEmpty(); current = q.poll()) {
+		for (Tuple current = q.poll(); !q.isEmpty(); current = q.poll()) {
 			// If we've already visited this node, we can skip over it. This can
 			// happen because there is a very good chance vertices will appear
 			// more than once in the priority queue. See details below.
 			if (visited.get(current.string)) {
 				continue;
 			}
-			
-			//Mark the vertex as visited
+
+			// Mark the vertex as visited
 			visited.replace(current.string, true);
-			
+
 			// If we find the node we're looking for,
 			// we can stop early.
 			if (current.string.equals(v)) {
 				buildPath(current, result, prev);
 				return result;
 			}
-			
+
 			outVertices = graph.get(current.string);
 			if (outVertices == null)
 				continue;
-			
+
 			int alt = current.dist + 1;
 			for (String s : outVertices) {
 				Tuple t = dist.get(s);
@@ -159,7 +161,7 @@ public class NetworkInfluence {
 					q.add(new Tuple(s, alt));
 				}
 			}
-			
+
 		}
 		return result;
 	}
@@ -176,7 +178,7 @@ public class NetworkInfluence {
 		while (!stack.isEmpty()) {
 			result.add(stack.pop());
 		}
-		
+
 	}
 
 	public int distance(String u, String v) {
@@ -197,36 +199,33 @@ public class NetworkInfluence {
 	}
 
 	public float influence(String u) {
-		String[] temp = new String[masterList.length];
-		for(int i = 0;i<temp.length;i++){
-			temp[i]= masterList[i];
-		}
-		return influenceHelper(u, 0, temp);
-		
-	
-	}
-	private float influenceHelper(String u, int layer, String[] arr){
-	int size = outDegree(u);
-		if(size == 0){
-			return (float) (1.0/powerFunction(layer));
-		}
-		int i = 0;
-		float influenceTotal = (float) 1.0/powerFunction(layer);
+		// implementation
 
-		while(i<size){
-			influenceTotal +=influenceHelper(graph.get(u).get(i),layer+1,arr);	
-			i++;
-			
+		int size = 0;
+
+		if (graph.get(u) == null) {
+			return 1 / (powerFunction(influenceCounter));
+		} else {
+			int i = 0;
+			size = graph.get(u).size();
+			while (i < size) {
+				influenceNumber += influence(graph.get(u).get(i));
+				i++;
+				influenceCounter++;
+			}
+
 		}
-		return influenceTotal;
+		return influenceNumber;
 	}
-	public int powerFunction(int pow){
+
+	public int powerFunction(int pow) {
 		int total = 1;
-			for(int i =0; i<pow;i++){
-				total = total*2;
+		for (int i = 0; i < pow; i++) {
+			total = total * 2;
 		}
 		return total;
 	}
+
 	public float influence(ArrayList<String> s) {
 		// implementation
 
@@ -257,17 +256,62 @@ public class NetworkInfluence {
 	}
 
 	public ArrayList<String> mostInfluentialModular(int k) {
-		// implementation
-
-		// replace this:
-		return null;
+		ArrayList<String> list = new ArrayList<String>();
+		PriorityQueue<Tuple2> pq = new PriorityQueue<Tuple2>(k, new Comparator<Tuple2>() {
+			public int compare(Tuple2 lhs, Tuple2 rhs) {
+				if (lhs.dist < rhs.dist)
+					return 1;
+				else if (lhs.dist > rhs.dist)
+					return -1;
+				return 0;
+			}
+		});
+		for (int i = 0; i < masterList.length; i++) {
+			Tuple2 element = new Tuple2(masterList[i], influence(masterList[i]));
+			pq.add(element);
+		}
+		for (int i = 0; i < k; i++) {
+			String s = pq.poll().string;
+			list.add(s);
+		}
+		return list;
 	}
 
 	public ArrayList<String> mostInfluentialSubModular(int k) {
-		// implementation
+		ArrayList<String> list = new ArrayList<String>();
+		String[] masterTemp = new String[masterList.length];
 
-		// replace this:
-		return null;
+		// do the loop k times
+		for (int x = 0; x < k; x++) {
+			
+			PriorityQueue<Tuple2> pq = new PriorityQueue<Tuple2>(k, new Comparator<Tuple2>() {
+				public int compare(Tuple2 lhs, Tuple2 rhs) {
+					if (lhs.dist < rhs.dist)
+						return 1;
+					else if (lhs.dist > rhs.dist)
+						return -1;
+					return 0;
+				}
+			});
+			for (int i = 0; i < masterTemp.length; i++) {
+				ArrayList<String> vList = list;
+				vList.add(masterTemp[i]);
+				Tuple2 vInf = new Tuple2(masterTemp[i],influence(vList));
+				pq.add(vInf);
+				
+			}
+			
+			// add found vertice to the list and remove it from masterTemp.
+			String s = pq.poll().string;
+			list.add(s);
+			for (int i=0;i<masterTemp.length;i++) {
+			    if (masterTemp[i].equals(s)) {
+			        masterTemp[i] = null;
+			        break;
+			    }
+			}
+		}
+		return list;
 	}
 
 	private class Tuple implements Comparable<Tuple> {
@@ -298,8 +342,37 @@ public class NetworkInfluence {
 
 	}
 
+	private class Tuple2 implements Comparable<Tuple2> {
+
+		String string;
+		float dist;
+
+		public Tuple2(String s, float i) {
+			string = s;
+			dist = i;
+		}
+
+		@Override
+		public int compareTo(Tuple2 other) {
+			if (this.dist < other.dist)
+				return -1;
+			else if (this.dist > other.dist)
+				return 1;
+			else
+				return 0;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + string + ", " + dist + ")";
+
+		}
+
+	}
+
 	public static void main(String[] args) throws IOException {
 		NetworkInfluence example2 = new NetworkInfluence("wikiCC.txt");
 		example2.outDegree(null);
 	}
 }
+
