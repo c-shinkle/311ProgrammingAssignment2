@@ -184,19 +184,20 @@ public class NetworkInfluence {
 
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k, new Comparator<Integer>() {
-		    public int compare(Integer lhs, Integer rhs) {
-		        if (lhs > rhs) return 1;
-		        if (lhs.equals(rhs)) return 0;
-		        return -1;
+		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
+		    public int compare(Tuple lhs, Tuple rhs) {
+		        if (lhs.dist < rhs.dist) return 1;
+		        else if (lhs.dist > rhs.dist) return -1;
+		        return 0;
 		    }
 		});
 		for(int i=0; i<masterList.length;i++) {
-			int element = outDegree(masterList[i]);
+			Tuple element = new Tuple(masterList[i],outDegree(masterList[i]));
 			pq.add(element);
 		}
 		for(int i=0; i<k;i++) {
-			
+			String s = pq.poll().string;
+			list.add(s);
 		}
 		return list;
 	}
