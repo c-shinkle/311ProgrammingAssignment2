@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.Stack;
 
 public class NetworkInfluence {
-	
+
 	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
 
@@ -46,24 +46,24 @@ public class NetworkInfluence {
 			System.out.println("File " + graphData + " was not found.");
 			return;
 		}
-		
+
 		String tmp = reader.nextLine();
 		int size = Integer.parseInt(tmp);
 		masterList = new String[size];
-		
+
 		for (int count = 1, index = 0; reader.hasNextLine(); count++) {
 			String line = reader.nextLine();
 			String[] parts = line.split(" ");
 			if (parts.length < 2) {
 				throw new RuntimeException("Too few arguements on line: " + count);
 			}
-			
+
 			String key = parts[0];
 			String value = parts[1];
-			
+
 			boolean isKeyDup = false;
 			boolean isValDup = false;
-			
+
 			for (int i = 0; i < index; i++) {
 				if (masterList[i].equals(key)) {
 					isKeyDup = true;
@@ -72,28 +72,26 @@ public class NetworkInfluence {
 					isValDup = true;
 				}
 			}
-			
+
 			if (!isKeyDup) {
 				masterList[index++] = key;
 			}
-			
+
 			if (!isValDup) {
 				masterList[index++] = value;
 			}
-			
+
 			if (!graph.containsKey(key)) {
 				ArrayList<String> edges = new ArrayList<String>();
 				edges.add(value);
 				graph.put(key, edges);
 			} else {
 				ArrayList<String> edges2 = graph.get(key);
-				if(!edges2.contains(value)) {
+				if (!edges2.contains(value)) {
 					edges2.add(value);
 				}
 			}
-			
-			
-			
+
 		}
 		reader.close();
 	}
@@ -112,7 +110,7 @@ public class NetworkInfluence {
 		
 		//dist.put(u, 0);
 		q.add(new Tuple(u, 0));
-		
+
 		for (String s : masterList) {
 			if (!s.equals(u)) {
 				Tuple t = new Tuple(s, Integer.MAX_VALUE);
@@ -120,25 +118,24 @@ public class NetworkInfluence {
 				q.add(t);
 			}
 		}
-		
-		while(!q.isEmpty()) {
+
+		while (!q.isEmpty()) {
 			Tuple current = q.poll();
 			if (current.string.equals(v)) {
 				Stack<String> stack = new Stack<String>();
 				String s = current.string;
-				
+
 				while (s != null) {
 					stack.push(s);
 					s = prev.get(s);
 				}
-				
+
 				while (!stack.isEmpty()) {
 					result.add(stack.pop());
 				}
-				
+
 				return result;
 			}
-			
 			ArrayList<String> outVertices = graph.get(current.string);
 			if (outVertices == null)
 				continue;
@@ -157,17 +154,17 @@ public class NetworkInfluence {
 	}
 
 	public int distance(String u, String v) {
-		ArrayList<String> list = shortestPath(u,v);
+		ArrayList<String> list = shortestPath(u, v);
 		int distance = list.size();
 		return distance;
 	}
 
 	public int distance(ArrayList<String> s, String v) {
 		int distance = Integer.MAX_VALUE;
-		for(int i=0; i<s.size(); i++) {
-			ArrayList<String> list = shortestPath(s.get(i),v);
+		for (int i = 0; i < s.size(); i++) {
+			ArrayList<String> list = shortestPath(s.get(i), v);
 			int distance2 = list.size();
-			if(distance2 < distance) {
+			if (distance2 < distance) {
 			}
 		}
 		return distance;
@@ -189,19 +186,22 @@ public class NetworkInfluence {
 
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		PriorityQueue<Integer> pq = new PriorityQueue<Integer>(k, new Comparator<Integer>() {
-		    public int compare(Integer lhs, Integer rhs) {
-		        if (lhs > rhs) return 1;
-		        if (lhs.equals(rhs)) return 0;
-		        return -1;
-		    }
+		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
+			public int compare(Tuple lhs, Tuple rhs) {
+				if (lhs.dist < rhs.dist)
+					return 1;
+				else if (lhs.dist > rhs.dist)
+					return -1;
+				return 0;
+			}
 		});
-		for(int i=0; i<masterList.length;i++) {
-			int element = outDegree(masterList[i]);
+		for (int i = 0; i < masterList.length; i++) {
+			Tuple element = new Tuple(masterList[i], outDegree(masterList[i]));
 			pq.add(element);
 		}
-		for(int i=0; i<k;i++) {
-			
+		for (int i = 0; i < k; i++) {
+			String s = pq.poll().string;
+			list.add(s);
 		}
 		return list;
 	}
@@ -219,12 +219,12 @@ public class NetworkInfluence {
 		// replace this:
 		return null;
 	}
-	
-	private class Tuple implements Comparable<Tuple>{
-		
+
+	private class Tuple implements Comparable<Tuple> {
+
 		String string;
 		int dist;
-		
+
 		public Tuple(String s, int i) {
 			string = s;
 			dist = i;
@@ -236,17 +236,17 @@ public class NetworkInfluence {
 				return -1;
 			else if (this.dist > other.dist)
 				return 1;
-			else 
+			else
 				return 0;
 		}
-		
 		@Override
 		public String toString() {
 			return "(" + string + ", " + dist + ")";
 			
 		}
+
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		NetworkInfluence example2 = new NetworkInfluence("wikiCC.txt");
 		example2.outDegree(null);
