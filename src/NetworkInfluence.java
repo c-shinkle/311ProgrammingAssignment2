@@ -279,13 +279,13 @@ public class NetworkInfluence {
 
 	public ArrayList<String> mostInfluentialSubModular(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		String[] masterTemp = new String[masterList.length];
+		String[] masterTemp = masterList;
 
 		// do the loop k times
 		for (int x = 0; x < k; x++) {
 			
-			PriorityQueue<Tuple2> pq = new PriorityQueue<Tuple2>(k, new Comparator<Tuple2>() {
-				public int compare(Tuple2 lhs, Tuple2 rhs) {
+			PriorityQueue<Tuple3> pq = new PriorityQueue<Tuple3>(k, new Comparator<Tuple3>() {
+				public int compare(Tuple3 lhs, Tuple3 rhs) {
 					if (lhs.dist < rhs.dist)
 						return 1;
 					else if (lhs.dist > rhs.dist)
@@ -296,20 +296,17 @@ public class NetworkInfluence {
 			for (int i = 0; i < masterTemp.length; i++) {
 				ArrayList<String> vList = list;
 				vList.add(masterTemp[i]);
-				Tuple2 vInf = new Tuple2(masterTemp[i],influence(vList));
+				Tuple3 vInf = new Tuple3(masterTemp[i],influence(vList),i);
 				pq.add(vInf);
 				
 			}
 			
 			// add found vertice to the list and remove it from masterTemp.
-			String s = pq.poll().string;
+			Tuple3 vertice = pq.poll();
+			String s = vertice.string;
+			int index = vertice.index;
+			masterTemp[index] = null;
 			list.add(s);
-			for (int i=0;i<masterTemp.length;i++) {
-			    if (masterTemp[i].equals(s)) {
-			        masterTemp[i] = null;
-			        break;
-			    }
-			}
 		}
 		return list;
 	}
@@ -354,6 +351,35 @@ public class NetworkInfluence {
 
 		@Override
 		public int compareTo(Tuple2 other) {
+			if (this.dist < other.dist)
+				return -1;
+			else if (this.dist > other.dist)
+				return 1;
+			else
+				return 0;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + string + ", " + dist + ")";
+
+		}
+
+	}
+	private class Tuple3 implements Comparable<Tuple3> {
+
+		String string;
+		float dist;
+		int index;
+
+		public Tuple3(String s, float i,int in) {
+			string = s;
+			dist = i;
+			index = in;
+		}
+
+		@Override
+		public int compareTo(Tuple3 other) {
 			if (this.dist < other.dist)
 				return -1;
 			else if (this.dist > other.dist)
