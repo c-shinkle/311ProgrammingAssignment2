@@ -56,25 +56,42 @@ public class NetworkInfluence {
 			if (parts.length < 2) {
 				throw new RuntimeException("Too few arguements on line: " + count);
 			}
+			
 			String key = parts[0];
 			String value = parts[1];
+			
+			boolean isKeyDup = false;
+			boolean isValDup = false;
+			
+			for (int i = 0; i < index; i++) {
+				if (masterList[i].equals(key)) {
+					isKeyDup = true;
+				}
+				if (masterList[i].equals(value)) {
+					isValDup = true;
+				}
+			}
+			
+			if (!isKeyDup) {
+				masterList[index++] = key;
+			}
+			
+			if (!isValDup) {
+				masterList[index++] = value;
+			}
+			
 			if (!graph.containsKey(key)) {
 				ArrayList<String> edges = new ArrayList<String>();
 				edges.add(value);
 				graph.put(key, edges);
-			}
-			else {
+			} else {
 				ArrayList<String> edges2 = graph.get(key);
 				if(!edges2.contains(value)) {
 					edges2.add(value);
 				}
 			}
 			
-//			if (!graph)
-//			
-//			if (!graph.containsKey(value)) {
-//				masterList[index++] = value;
-//			}
+			
 			
 		}
 		reader.close();
@@ -94,16 +111,14 @@ public class NetworkInfluence {
 		HashMap<String, String> prev = new HashMap<>();
 		
 		dist.put(u, 0);
+		q.add(u);
 		
-		Set<Entry<String, ArrayList<String>>> set =  graph.entrySet();
-		for (Entry<String, ArrayList<String>> e : set) {
-			if (!e.getKey().equals(u)) {
-				dist.put(e.getKey(), Integer.MAX_VALUE);
-				//
+		for (String s : masterList) {
+			if (!s.equals(u)) {
+				dist.put(s, Integer.MAX_VALUE);
+				q.add(s);
 			}
 		}
-		
-		q.add(u);
 		
 		while(!q.isEmpty()) {
 			String current = q.poll();
@@ -127,10 +142,10 @@ public class NetworkInfluence {
 			
 			ArrayList<String> outVertices = graph.get(current);
 			for (String s : outVertices) {
-				int alt = dist.get(s) + 1;
+				int alt = dist.get(current) + 1;
 				if (alt < dist.get(s)) {
 					dist.put(s, alt);
-					prev.put(s, s);
+					prev.put(s, current);
 				}
 			}
 		}
