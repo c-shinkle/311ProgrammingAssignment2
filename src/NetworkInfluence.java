@@ -32,6 +32,7 @@ public class NetworkInfluence {
 
 	String[] masterList;
 	HashMap<String, ArrayList<String>> graph;
+
 	// NOTE: graphData is an absolute file path that contains graph data, NOT
 	// the
 	// raw graph data itself
