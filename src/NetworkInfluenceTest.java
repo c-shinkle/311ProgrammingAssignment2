@@ -22,7 +22,7 @@ public class NetworkInfluenceTest {
 		actual.add("A");
 		actual.add("D");
 		ArrayList<String> expected = A.shortestPath("A", "D");
-		assertEquals(expected, actual);
+		assertEquals(actual, expected);
 	}
 	
 }

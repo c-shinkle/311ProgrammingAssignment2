@@ -107,22 +107,23 @@ public class NetworkInfluence {
 	public ArrayList<String> shortestPath(String u, String v) {
 		ArrayList<String> result = new ArrayList<>();
 		PriorityQueue<Tuple> q = new PriorityQueue<Tuple>();
-		HashMap<String, Integer> dist = new HashMap<>(); 
+		HashMap<String, Tuple> dist = new HashMap<>(); 
 		HashMap<String, String> prev = new HashMap<>();
 		
-		dist.put(u, 0);
+		//dist.put(u, 0);
 		q.add(new Tuple(u, 0));
 		
 		for (String s : masterList) {
 			if (!s.equals(u)) {
-				dist.put(s, Integer.MAX_VALUE);
-				q.add(new Tuple(s, Integer.MAX_VALUE));
+				Tuple t = new Tuple(s, Integer.MAX_VALUE);
+				dist.put(s, t);
+				q.add(t);
 			}
 		}
 		
 		while(!q.isEmpty()) {
 			Tuple current = q.poll();
-			if (current.equals(v)) {
+			if (current.string.equals(v)) {
 				Stack<String> stack = new Stack<String>();
 				String s = current.string;
 				
@@ -138,11 +139,15 @@ public class NetworkInfluence {
 				return result;
 			}
 			
-			ArrayList<String> outVertices = graph.get(current);
+			ArrayList<String> outVertices = graph.get(current.string);
+			if (outVertices == null)
+				continue;
+			//int alt = dist.get(current.string) + 1;
+			int alt = current.dist + 1;
 			for (String s : outVertices) {
-				int alt = dist.get(current) + 1;
-				if (alt < dist.get(s)) {
-					dist.put(s, alt);
+				if (alt < dist.get(s).dist) {
+				//if (alt < graph.get(s)) {
+					//dist.put(s, alt);
 					prev.put(s, current.string);
 					q.add(new Tuple(s, alt));
 				}
@@ -235,7 +240,11 @@ public class NetworkInfluence {
 				return 0;
 		}
 		
-		
+		@Override
+		public String toString() {
+			return "(" + string + ", " + dist + ")";
+			
+		}
 	}
 	
 	public static void main(String[] args) throws IOException {
