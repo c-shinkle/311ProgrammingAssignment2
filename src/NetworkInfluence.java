@@ -287,8 +287,8 @@ public class NetworkInfluence {
     }
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		PriorityQueue<outDegreeTuple> pq = new PriorityQueue<outDegreeTuple>(k, new Comparator<outDegreeTuple>() {
-			public int compare(outDegreeTuple lhs, outDegreeTuple rhs) {
+		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
+			public int compare(Tuple lhs, Tuple rhs) {
 				if (lhs.dist <= rhs.dist)
 					return 1;
 				else if (lhs.dist > rhs.dist)
@@ -297,7 +297,7 @@ public class NetworkInfluence {
 			}
 		});
 		for (int i = 0; i < masterList.length; i++) {
-			outDegreeTuple element = new outDegreeTuple(masterList[i], outDegree(masterList[i]));
+			Tuple element = new Tuple(masterList[i], outDegree(masterList[i]));
 			pq.add(element);
 		}
 		for (int i = 0; i < k; i++) {
@@ -365,18 +365,18 @@ public class NetworkInfluence {
 
 	}
 
-	private class outDegreeTuple implements Comparable<outDegreeTuple> {
+	private class Tuple implements Comparable<Tuple> {
 
 		String string;
 		int dist;
 
-		public outDegreeTuple(String s, int i) {
+		public Tuple(String s, int i) {
 			string = s;
 			dist = i;
 		}
 
 		@Override
-		public int compareTo(outDegreeTuple other) {
+		public int compareTo(Tuple other) {
 			if (this.dist < other.dist)
 				return -1;
 			else if (this.dist > other.dist)
