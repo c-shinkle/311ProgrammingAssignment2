@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -105,68 +106,40 @@ public class NetworkInfluence {
 
 	public ArrayList<String> shortestPath(String u, String v) {
 		ArrayList<String> result = new ArrayList<>();
-		ArrayList<String> outVertices;
-		PriorityQueue<Tuple> q = new PriorityQueue<Tuple>();
-		HashMap<String, Tuple> dist = new HashMap<>();
+		Queue<String> queue = new LinkedList<>();
+		HashMap<String, Integer> dist = new HashMap<>();
 		HashMap<String, String> prev = new HashMap<>();
-		HashMap<String, Boolean> visited = new HashMap<>();
-
-		q.add(new Tuple(u, 0));
-
-		for (String s : masterList) {
-			visited.put(s, false);
-			if (!s.equals(u)) {
-				Tuple t = new Tuple(s, Integer.MAX_VALUE);
-				dist.put(s, t);
-				q.add(t);
-			}
-		}
-
-		for (Tuple current = q.poll(); !q.isEmpty(); current = q.poll()) {
-			// If we've already visited this node, we can skip over it. This can
-			// happen because there is a very good chance vertices will appear
-			// more than once in the priority queue. See details below.
-			if (visited.get(current.string)) {
-				continue;
-			}
-
-			// Mark the vertex as visited
-			visited.replace(current.string, true);
-
-			// If we find the node we're looking for,
-			// we can stop early.
-			if (current.string.equals(v)) {
+		
+		for (String node : masterList) 
+			dist.put(node, Integer.MAX_VALUE);
+		
+		dist.replace(u, 0);
+		queue.add(u);
+		
+		while (!queue.isEmpty()) {
+			String current = queue.poll();
+			
+			if (current.equals(v)) {
 				buildPath(current, result, prev);
 				return result;
 			}
-
-			outVertices = graph.get(current.string);
-			if (outVertices == null)
-				continue;
-
-			int alt = current.dist + 1;
-			for (String s : outVertices) {
-				Tuple t = dist.get(s);
-				if (alt < t.dist) {
-					dist.get(s).dist = alt;
-					prev.put(s, current.string);
-					// I know this seems odd, but the priority queue in Java
-					// doesn't have a decrease key method so my work around is
-					// to re-insert the vertex but with a lower distance. That
-					// way, it will get bumped up in priority. This is why it is
-					// necessary to check if the vertex has been visited earlier
-					// in the method.
-					q.add(new Tuple(s, alt));
+			
+			ArrayList<String> outVertices = graph.get(current);
+			for (String neighbor : outVertices) {
+				int alt = dist.get(current) + 1;
+				if (alt < dist.get(neighbor)) {
+					dist.replace(neighbor, alt);
+					prev.put(neighbor, current);
+					queue.add(neighbor);
 				}
 			}
-
 		}
 		return result;
 	}
 
-	private void buildPath(Tuple current, ArrayList<String> result, HashMap<String, String> prev) {
+	private void buildPath(String current, ArrayList<String> result, HashMap<String, String> prev) {
 		Stack<String> stack = new Stack<String>();
-		String s = current.string;
+		String s = current;
 
 		while (s != null) {
 			stack.push(s);

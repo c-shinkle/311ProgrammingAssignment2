@@ -21,7 +21,7 @@ public class InfluenceListTests {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
 		ab.add("B");
-		float expected = 24/8;
+		float expected = (float) 1.0;
 		float actual = A.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
