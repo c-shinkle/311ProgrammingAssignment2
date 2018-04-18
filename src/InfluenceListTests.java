@@ -9,11 +9,13 @@ public class InfluenceListTests {
 
 	private NetworkInfluence A;
 	private NetworkInfluence B;
+	private NetworkInfluence C;
 	
 	@Before
 	public void setup() {
 		A = new NetworkInfluence("testA");
 		B = new NetworkInfluence("testB");
+		C = new NetworkInfluence("testC");
 	}
 
 	@Test
@@ -34,6 +36,15 @@ public class InfluenceListTests {
 		ab.add("B");
 		float expected = (float)3.25;
 		float actual = B.influence(ab);
+		assertEquals(expected, actual,.001);
+	}
+	@Test
+	public void testCInfluenceList() {
+		ArrayList<String> ab = new ArrayList<String>();
+		ab.add("A");
+		ab.add("D");
+		float expected = 9/2;
+		float actual = C.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
 }
