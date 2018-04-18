@@ -33,4 +33,19 @@ public class NIShortestPathTests {
 		ArrayList<String> actual = B.shortestPath("A", "D");
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	public void testAOutDegree() {
+		int expected = 2;
+		int actual = A.outDegree("A");
+		assertEquals(expected,actual);
+	}
+	
+	@Test
+	public void testBOutDegree() {
+		int expected = 2;
+		int actual = B.outDegree("A");
+		assertEquals(expected,actual);
+	}
+	
 }
