@@ -147,6 +147,9 @@ public class NetworkInfluence {
 			int alt = current.dist + 1;
 			for (String s : outVertices) {
 				Tuple t = dist.get(s);
+				if (t==null){
+					return new ArrayList<>();
+				}
 				if (alt < t.dist) {
 					dist.get(s).dist = alt;
 					prev.put(s, current.string);
@@ -257,9 +260,10 @@ public class NetworkInfluence {
 				
 				for(String givenString: s){
 					current = shortestPath(givenString,masterString).size();
+					current --;//shortestPath.size() is one too big
 					if(current!=0){
 						
-						if(current<currentLowest){
+						if(current<currentLowest&&current>0){
 							currentLowest = current;
 						}
 					
@@ -273,6 +277,7 @@ public class NetworkInfluence {
 			}
 		}
 		// replace this:
+		runningTotal = runningTotal + s.size();//Added this to account for the influental node on themselves
 		return runningTotal;
 	}
 

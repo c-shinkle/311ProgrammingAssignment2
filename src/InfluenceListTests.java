@@ -20,8 +20,9 @@ public class InfluenceListTests {
 	public void testAInfluenceList() {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
-		ab.add("B");
-		float expected = 24/8;
+		ab.add("D");
+		
+		float expected = (float) 4.5;
 		float actual = A.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
@@ -31,7 +32,7 @@ public class InfluenceListTests {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
 		ab.add("B");
-		float expected = 26/8;
+		float expected = (float)3.25;
 		float actual = B.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
