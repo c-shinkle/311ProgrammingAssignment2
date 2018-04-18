@@ -266,9 +266,9 @@ public class NetworkInfluence {
 					
 				}
 				
-			}
-			if(currentLowest!=200){//If no path exists Currentlowest isn't updated
-				runningTotal+= 1.0/power(2,currentLowest);
+				if(currentLowest!=200){//If no path exists Currentlowest isn't updated
+					runningTotal+= 1.0/power(2,currentLowest);
+				}
 			}
 		}
 		// replace this:
