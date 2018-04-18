@@ -211,7 +211,9 @@ public class WikiCrawler {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		ArrayList<String> topics = new ArrayList<String>();
-		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "Test.txt");
+		topics.add("Iowa State");
+		topics.add("Cyclones");
+		WikiCrawler example = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
 		example.crawl();
 		System.out.println("cheese");
 	}
