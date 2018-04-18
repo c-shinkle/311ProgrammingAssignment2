@@ -19,12 +19,23 @@ public class InfluenceListTests {
 	}
 
 	@Test
-	public void testAInfluenceList() {
+	public void testAInfluenceList1() {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
-		ab.add("D");
+		ab.add("B");
 		
-		float expected = (float) 4.5;
+		float expected = (float) 3;
+		float actual = A.influence(ab);
+		assertEquals(expected, actual,.001);
+	}
+	
+	@Test
+	public void testAInfluenceList2() {
+		ArrayList<String> ab = new ArrayList<String>();
+		ab.add("A");
+		ab.add("C");
+		
+		float expected = (float) 3;
 		float actual = A.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
@@ -38,6 +49,7 @@ public class InfluenceListTests {
 		float actual = B.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
+	
 	@Test
 	public void testCInfluenceList() {
 		ArrayList<String> ab = new ArrayList<String>();

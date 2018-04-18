@@ -125,6 +125,10 @@ public class NetworkInfluence {
 			}
 
 			ArrayList<String> outVertices = graph.get(current);
+			
+			if (outVertices == null)
+				continue;
+			
 			for (String neighbor : outVertices) {
 				int alt = dist.get(current) + 1;
 				if (alt < dist.get(neighbor)) {
@@ -218,36 +222,33 @@ public class NetworkInfluence {
 		// implementation
 		HashMap<String, String> GivenStringsMap = new HashMap<>();
 		int currentLowest=0;
-		int current=100;
+		int current = Integer.MAX_VALUE;
 		float runningTotal=0;
 		for(String givenString : s){
-			GivenStringsMap.put(givenString,givenString);
+			GivenStringsMap.put(givenString, givenString);
 		}
-		for(String masterString:masterList ) {
-			if(!GivenStringsMap.containsKey(masterString)){
-				currentLowest=200;
+		for (String masterString : masterList) {
+			if (!GivenStringsMap.containsKey(masterString)) {
+				currentLowest = Integer.MAX_VALUE;
 				current = 0;
-				
-				for(String givenString: s){
-					current = shortestPath(givenString,masterString).size();
-					current --;//shortestPath.size() is one too big
-					if(current!=0){
-						
-						if(current<currentLowest&&current>0){
+				for (String givenString : s) {
+					current = shortestPath(givenString, masterString).size();
+					current--;// shortestPath.size() is one too big
+					if (current != 0) {
+
+						if (current < currentLowest && current > 0) {
 							currentLowest = current;
 						}
-					
 					}
-					
 				}
-				
-				if(currentLowest!=200){//If no path exists Currentlowest isn't updated
-					runningTotal+= 1.0/power(2,currentLowest);
+				// If no path exists Currentlowest isn't updated
+				if (currentLowest != Integer.MAX_VALUE) {
+					runningTotal += 1.0 / power(2, currentLowest);
 				}
 			}
 		}
-		// replace this:
-		runningTotal = runningTotal + s.size();//Added this to account for the influental node on themselves
+		//Added this to account for the influental node on themselves
+		runningTotal = runningTotal + s.size();
 		return runningTotal;
 	}
 
