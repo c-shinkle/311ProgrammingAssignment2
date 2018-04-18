@@ -9,11 +9,13 @@ public class MostInfluentialModularTests {
 	
 	private NetworkInfluence A;
 	private NetworkInfluence B;
+	private NetworkInfluence C;
 	
 	@Before
 	public void setup() {
 		A = new NetworkInfluence("testA");
 		B = new NetworkInfluence("testB");
+		C = new NetworkInfluence("testC");
 	}
 	
 	@Test
@@ -26,12 +28,27 @@ public class MostInfluentialModularTests {
 	}
 	
 	@Test
-	public void testBMostInfluentialModular() {
+	public void testBMostInfluentialModular2() {
 		ArrayList<String> expected = new ArrayList<String>();
 		expected.add("A");
 		expected.add("B");
 		expected.add("C");
 		ArrayList<String> actual = B.mostInfluentialModular(3);
+		assertEquals(expected,actual);
+	}
+	@Test
+	public void testBMostInfluentialModular3() {
+		ArrayList<String> expected = new ArrayList<String>();
+		expected.add("A");
+		expected.add("G");
+		expected.add("E");
+		expected.add("F");
+		expected.add("D");
+		expected.add("C");
+		expected.add("B");
+		expected.add("H");
+		expected.add("I");
+		ArrayList<String> actual = C.mostInfluentialModular(9);
 		assertEquals(expected,actual);
 	}
 

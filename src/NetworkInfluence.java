@@ -123,7 +123,7 @@ public class NetworkInfluence {
 				buildPath(current, result, prev);
 				return result;
 			}
-			
+
 			ArrayList<String> outVertices = graph.get(current);
 			for (String neighbor : outVertices) {
 				int alt = dist.get(current) + 1;
@@ -230,9 +230,10 @@ public class NetworkInfluence {
 				
 				for(String givenString: s){
 					current = shortestPath(givenString,masterString).size();
+					current --;//shortestPath.size() is one too big
 					if(current!=0){
 						
-						if(current<currentLowest){
+						if(current<currentLowest&&current>0){
 							currentLowest = current;
 						}
 					
@@ -246,6 +247,7 @@ public class NetworkInfluence {
 			}
 		}
 		// replace this:
+		runningTotal = runningTotal + s.size();//Added this to account for the influental node on themselves
 		return runningTotal;
 	}
 
@@ -262,7 +264,7 @@ public class NetworkInfluence {
 		ArrayList<String> list = new ArrayList<String>();
 		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
 			public int compare(Tuple lhs, Tuple rhs) {
-				if (lhs.dist < rhs.dist)
+				if (lhs.dist <= rhs.dist)
 					return 1;
 				else if (lhs.dist > rhs.dist)
 					return -1;
@@ -282,9 +284,9 @@ public class NetworkInfluence {
 
 	public ArrayList<String> mostInfluentialModular(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		PriorityQueue<Tuple2> pq = new PriorityQueue<Tuple2>(k, new Comparator<Tuple2>() {
-			public int compare(Tuple2 lhs, Tuple2 rhs) {
-				if (lhs.dist < rhs.dist)
+		PriorityQueue<modularTuple> pq = new PriorityQueue<modularTuple>(k, new Comparator<modularTuple>() {
+			public int compare(modularTuple lhs, modularTuple rhs) {
+				if (lhs.dist <= rhs.dist)
 					return 1;
 				else if (lhs.dist > rhs.dist)
 					return -1;
@@ -292,7 +294,7 @@ public class NetworkInfluence {
 			}
 		});
 		for (int i = 0; i < masterList.length; i++) {
-			Tuple2 element = new Tuple2(masterList[i], influence(masterList[i]));
+			modularTuple element = new modularTuple(masterList[i], influence(masterList[i]));
 			pq.add(element);
 		}
 		for (int i = 0; i < k; i++) {
@@ -310,9 +312,9 @@ public class NetworkInfluence {
 		// do the loop k times
 		for (int x = 0; x < k; x++) {
 
-			PriorityQueue<Tuple3> pq = new PriorityQueue<Tuple3>(k, new Comparator<Tuple3>() {
-				public int compare(Tuple3 lhs, Tuple3 rhs) {
-					if (lhs.dist < rhs.dist)
+			PriorityQueue<subModularTuple> pq = new PriorityQueue<subModularTuple>(k, new Comparator<subModularTuple>() {
+				public int compare(subModularTuple lhs, subModularTuple rhs) {
+					if (lhs.dist <= rhs.dist)
 						return 1;
 					else if (lhs.dist > rhs.dist)
 						return -1;
@@ -322,13 +324,13 @@ public class NetworkInfluence {
 			for (int i = 0; i < masterTemp.length; i++) {
 				ArrayList<String> vList = list;
 				vList.add(masterTemp[i]);
-				Tuple3 vInf = new Tuple3(masterTemp[i], influence(vList), i);
+				subModularTuple vInf = new subModularTuple(masterTemp[i], influence(vList), i);
 				pq.add(vInf);
 
 			}
 
 			// add found vertice to the list and remove it from masterTemp.
-			Tuple3 vertice = pq.poll();
+			subModularTuple vertice = pq.poll();
 			String s = vertice.string;
 			int index = vertice.index;
 			masterTemp[index] = null;
@@ -366,18 +368,18 @@ public class NetworkInfluence {
 
 	}
 
-	private class Tuple2 implements Comparable<Tuple2> {
+	private class modularTuple implements Comparable<modularTuple> {
 
 		String string;
 		float dist;
 
-		public Tuple2(String s, float i) {
+		public modularTuple(String s, float i) {
 			string = s;
 			dist = i;
 		}
 
 		@Override
-		public int compareTo(Tuple2 other) {
+		public int compareTo(modularTuple other) {
 			if (this.dist < other.dist)
 				return -1;
 			else if (this.dist > other.dist)
@@ -394,20 +396,20 @@ public class NetworkInfluence {
 
 	}
 
-	private class Tuple3 implements Comparable<Tuple3> {
+	private class subModularTuple implements Comparable<subModularTuple> {
 
 		String string;
 		float dist;
 		int index;
 
-		public Tuple3(String s, float i, int in) {
+		public subModularTuple(String s, float i, int in) {
 			string = s;
 			dist = i;
 			index = in;
 		}
 
 		@Override
-		public int compareTo(Tuple3 other) {
+		public int compareTo(subModularTuple other) {
 			if (this.dist < other.dist)
 				return -1;
 			else if (this.dist > other.dist)

@@ -8,11 +8,13 @@ public class NIShortestPathTests {
 
 	private NetworkInfluence A;
 	private NetworkInfluence B;
+	private NetworkInfluence C;
 	
 	@Before
 	public void setup() {
 		A = new NetworkInfluence("testA");
 		B = new NetworkInfluence("testB");
+		C = new NetworkInfluence("testC");
 	}
 	
 	@Test
@@ -45,6 +47,12 @@ public class NIShortestPathTests {
 	public void testBOutDegree() {
 		int expected = 2;
 		int actual = B.outDegree("A");
+		assertEquals(expected,actual);
+	}
+	@Test
+	public void testCOutDegree() {
+		int expected = 2;
+		int actual = C.outDegree("E");
 		assertEquals(expected,actual);
 	}
 	
