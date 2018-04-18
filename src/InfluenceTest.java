@@ -15,7 +15,27 @@ public class InfluenceTest {
 		A = new NetworkInfluence("testA");
 		B = new NetworkInfluence("testB");
 	}
-	
+	@Test
+	public void testInfluenceString() {
+		float expected = 18/8;
+		float actual = A.influence("A");
+		assertEquals(expected, actual,.001);
+	}
+	@Test
+	public void testInfluenceString2() {
+		float expected = 20/8;
+		float actual = B.influence("A");
+		assertEquals(expected, actual,.001);
+	}
+	@Test
+	public void testInfluenceList() {
+		ArrayList<String> ab = new ArrayList<String>();
+		ab.add("A");
+		ab.add("B");
+		float expected = 24/8;
+		float actual = A.influence(ab);
+		assertEquals(expected, actual,.001);
+	}
 	@Test
 	public void testAShortestPath() {
 		float expected = (float)1.25;
@@ -48,6 +68,15 @@ public class InfluenceTest {
 		expected.add("A");
 		expected.add("B");
 		ArrayList<String> actual = A.mostInfluentialModular(2);
+		assertEquals(expected,actual);
+	}
+	@Test
+	public void testMostInfluentialModular2() {
+		ArrayList<String> expected = new ArrayList<String>();
+		expected.add("A");
+		expected.add("B");
+		expected.add("C");
+		ArrayList<String> actual = B.mostInfluentialModular(3);
 		assertEquals(expected,actual);
 	}
 	@Test
