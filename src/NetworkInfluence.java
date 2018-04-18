@@ -199,6 +199,7 @@ public class NetworkInfluence {
 	public float influence(String u) {
 		HashMap<String, ArrayList<String>> MST = buildMST(u);
 		float result = influenceHelper(u, .5, MST);
+		result = result +1;
 		return result;
 
 	}
