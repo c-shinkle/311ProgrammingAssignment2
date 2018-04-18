@@ -261,6 +261,7 @@ public class NetworkInfluence {
         else
             return x * power(x, y / 2) * power(x, y / 2);
     }
+	
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
 		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {

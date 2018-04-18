@@ -28,7 +28,7 @@ public class MostInfluentialModularTests {
 	}
 	
 	@Test
-	public void testBMostInfluentialModular2() {
+	public void testBMostInfluentialModular() {
 		ArrayList<String> expected = new ArrayList<String>();
 		expected.add("A");
 		expected.add("B");
@@ -37,7 +37,7 @@ public class MostInfluentialModularTests {
 		assertEquals(expected,actual);
 	}
 	@Test
-	public void testBMostInfluentialModular3() {
+	public void testCMostInfluentialModular() {
 		ArrayList<String> expected = new ArrayList<String>();
 		expected.add("A");
 		expected.add("G");
