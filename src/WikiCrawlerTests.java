@@ -23,53 +23,53 @@ public class WikiCrawlerTests {
 	
 	//Test for findLinks helper method
 	
-	@Test
-	public void findLinks1() throws IOException, InterruptedException {
-		complexityTheory.crawl();
-		ArrayList<String> expected = new ArrayList<String>();
-		ArrayList<String> actual = complexityTheory.topics;
-		assertEquals(expected,actual);
-	}
-	@Test
-	public void findLinks2() throws IOException, InterruptedException {
-		iowaState.crawl();
-		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
-		ArrayList<String> actual = iowaState.topics;
-		assertEquals(expected,actual);
-	}
-	@Test
-	public void findLinks3() throws IOException, InterruptedException {
-		comScience.crawl();
-		ArrayList<String> expected = new ArrayList<String>();
-		ArrayList<String> actual = comScience.topics;
-		assertEquals(expected,actual);
-	}
-	
-	
-	//Tests for hasTopics helper method
-	
-	@Test
-	public void hasTopics1() throws IOException, InterruptedException {
-		String expected = null;
-		String actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	public void hasTopics2() throws IOException, InterruptedException {
-		iowaState.crawl();
-		ArrayList<String> expected = null;
-		ArrayList<String> actual = null;
-		assertEquals(expected,actual);
-	}
-	@Test
-	public void hasTopics3() throws IOException, InterruptedException {
-		comScience.crawl();
-		ArrayList<String> expected = null;
-		ArrayList<String> actual = null;
-		assertEquals(expected,actual);
-	}
-	
-	
+//	@Test
+//	public void findLinks1() throws IOException, InterruptedException {
+//		complexityTheory.crawl();
+//		ArrayList<String> expected = new ArrayList<String>();
+//		ArrayList<String> actual = complexityTheory.topics;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void findLinks2() throws IOException, InterruptedException {
+//		iowaState.crawl();
+//		ArrayList<String> expected = new ArrayList<String>(Arrays.asList("IowaState","cyclones"));
+//		ArrayList<String> actual = iowaState.topics;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void findLinks3() throws IOException, InterruptedException {
+//		comScience.crawl();
+//		ArrayList<String> expected = new ArrayList<String>();
+//		ArrayList<String> actual = comScience.topics;
+//		assertEquals(expected,actual);
+//	}
+//	
+//	
+//	//Tests for hasTopics helper method
+//	
+//	@Test
+//	public void hasTopics1() throws IOException, InterruptedException {
+//		String expected = null;
+//		String actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void hasTopics2() throws IOException, InterruptedException {
+//		iowaState.crawl();
+//		ArrayList<String> expected = null;
+//		ArrayList<String> actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	@Test
+//	public void hasTopics3() throws IOException, InterruptedException {
+//		comScience.crawl();
+//		ArrayList<String> expected = null;
+//		ArrayList<String> actual = null;
+//		assertEquals(expected,actual);
+//	}
+//	
+//	
 	//Tests for fetchPage helper method
 	
 	

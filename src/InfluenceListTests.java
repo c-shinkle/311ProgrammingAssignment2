@@ -33,9 +33,9 @@ public class InfluenceListTests {
 	public void testAInfluenceList2() {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
-		ab.add("B");
+		ab.add("D");
 		
-		float expected = (float) 3;
+		float expected = (float) 2.75;
 		float actual = A.influence(ab);
 		assertEquals(expected, actual,.001);
 	}

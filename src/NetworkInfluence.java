@@ -158,19 +158,19 @@ public class NetworkInfluence {
 
 	public int distance(String u, String v) {
 		ArrayList<String> list = shortestPath(u, v);
-		int distance = list.size();
-		return distance;
+		int distance = list.size() - 1;
+		return (distance != 0) ? distance : -1;
 	}
 
 	public int distance(ArrayList<String> s, String v) {
-		int distance = Integer.MAX_VALUE;
+		int minDist = Integer.MAX_VALUE;
 		for (int i = 0; i < s.size(); i++) {
-			ArrayList<String> list = shortestPath(s.get(i), v);
-			int distance2 = list.size();
-			if (distance2 < distance) {
+			int current = distance(s.get(i), v);
+			if (current != -1 && current < minDist) {
+				minDist = current;
 			}
 		}
-		return distance;
+		return (minDist == Integer.MAX_VALUE) ? -1 : minDist;
 	}
 
 	public float influence(String u) {
@@ -221,7 +221,6 @@ public class NetworkInfluence {
 	public float influence(ArrayList<String> s) {
 		// implementation
 		HashMap<String, String> GivenStringsMap = new HashMap<>();
-		int currentLowest = 0;
 		int current = Integer.MAX_VALUE;
 		float runningTotal = 0;
 		for (String givenString : s) {
@@ -229,21 +228,10 @@ public class NetworkInfluence {
 		}
 		for (String masterString : masterList) {
 			if (!GivenStringsMap.containsKey(masterString)) {
-				currentLowest = Integer.MAX_VALUE;
-				current = 0;
-				for (String givenString : s) {
-					current = shortestPath(givenString, masterString).size();
-					current--;// shortestPath.size() is one too big
-					if (current != 0) {
-
-						if (current < currentLowest && current > 0) {
-							currentLowest = current;
-						}
-					}
-				}
+				current = distance(s, masterString);
 				// If no path exists Currentlowest isn't updated
-				if (currentLowest != Integer.MAX_VALUE) {
-					runningTotal += 1.0 / power(2, currentLowest);
+				if (current > 0) {
+					runningTotal += 1.0 / power(2, current);
 				}
 			}
 		}
@@ -308,11 +296,12 @@ public class NetworkInfluence {
 
 	public ArrayList<String> mostInfluentialSubModular(int k) {
 		ArrayList<String> list = new ArrayList<String>();
-		String[] masterTemp = masterList;
+		boolean[] masterTemp = new boolean[masterList.length];
+		for (int i = 0; i < masterList.length; i++)
+			masterTemp[i] = true;
 
 		// do the loop k times
 		for (int x = 0; x < k; x++) {
-
 			PriorityQueue<subModularTuple> pq = new PriorityQueue<subModularTuple>(k,
 					new Comparator<subModularTuple>() {
 						public int compare(subModularTuple lhs, subModularTuple rhs) {
@@ -323,14 +312,15 @@ public class NetworkInfluence {
 							return 0;
 						}
 					});
+			
 			for (int i = 0; i < masterTemp.length; i++) {
-				if (masterTemp[i] != null) {
+				if (masterTemp[i]) {
 					ArrayList<String> vList = new ArrayList<String>();
 					for (int j = 0; j < list.size(); j++) {
 						vList.add(list.get(j));
 					}
-					vList.add(masterTemp[i]);
-					subModularTuple vInf = new subModularTuple(masterTemp[i], influence(vList), i);
+					vList.add(masterList[i]);
+					subModularTuple vInf = new subModularTuple(masterList[i], influence(vList), i);
 					pq.add(vInf);
 
 				}
@@ -340,11 +330,10 @@ public class NetworkInfluence {
 			subModularTuple vertice = pq.poll();
 			String s = vertice.string;
 			int index = vertice.index;
-			masterTemp[index] = null;
+			masterTemp[index] = false;
 			list.add(s);
 		}
 		return list;
-
 	}
 
 	private class Tuple implements Comparable<Tuple> {
