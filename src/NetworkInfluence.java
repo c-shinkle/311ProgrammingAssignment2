@@ -240,21 +240,50 @@ public class NetworkInfluence {
 		return (float) influenceTotal;
 	}
 
-	public int powerFunction(int pow) {
-		int total = 1;
-		for (int i = 0; i < pow; i++) {
-			total = total * 2;
-		}
-		return total;
-	}
-
 	public float influence(ArrayList<String> s) {
 		// implementation
-
+		HashMap<String, String> GivenStringsMap = new HashMap<>();
+		int currentLowest=0;
+		int current=100;
+		float runningTotal=0;
+		for(String givenString : s){
+			GivenStringsMap.put(givenString,givenString);
+		}
+		for(String masterString:masterList ) {
+			if(!GivenStringsMap.containsKey(masterString)){
+				currentLowest=200;
+				current = 0;
+				
+				for(String givenString: s){
+					current = shortestPath(givenString,masterString).size();
+					if(current!=0){
+						
+						if(current<currentLowest){
+							currentLowest = current;
+						}
+					
+					}
+					
+				}
+				
+			}
+			if(currentLowest!=200){//If no path exists Currentlowest isn't updated
+				runningTotal+= 1.0/power(2,currentLowest);
+			}
+		}
 		// replace this:
-		return -1f;
+		return runningTotal;
 	}
 
+	private int power(int x, int y)
+    {
+        if (y == 0)
+            return 1;
+        else if (y % 2 == 0)
+            return power(x, y / 2) * power(x, y / 2);
+        else
+            return x * power(x, y / 2) * power(x, y / 2);
+    }
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
 		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
