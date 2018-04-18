@@ -37,6 +37,15 @@ public class InfluenceTest {
 		assertEquals(expected, actual,.001);
 	}
 	@Test
+	public void testInfluenceList2() {
+		ArrayList<String> ab = new ArrayList<String>();
+		ab.add("A");
+		ab.add("B");
+		float expected = 26/8;
+		float actual = A.influence(ab);
+		assertEquals(expected, actual,.001);
+	}
+	@Test
 	public void testAShortestPath() {
 		float expected = (float)1.25;
 		float actual = A.influence("A");
@@ -56,10 +65,23 @@ public class InfluenceTest {
 		assertEquals(expected,actual);
 	}
 	@Test
+	public void testOutDegree2() {
+		int expected = 2;
+		int actual = B.outDegree("A");
+		assertEquals(expected,actual);
+	}
+	@Test
 	public void testMostInfluentialDegree() {
 		ArrayList<String> expected = new ArrayList<String>();
 		expected.add("A");
 		ArrayList<String> actual = A.mostInfluentialDegree(1);
+		assertEquals(expected,actual);
+	}
+	@Test
+	public void testMostInfluentialDegree2() {
+		ArrayList<String> expected = new ArrayList<String>();
+		expected.add("A");
+		ArrayList<String> actual = B.mostInfluentialDegree(3);
 		assertEquals(expected,actual);
 	}
 	@Test
@@ -85,5 +107,10 @@ public class InfluenceTest {
 		ArrayList<String> actual = A.mostInfluentialSubModular(2);
 		assertEquals(expected,actual);
 	}
-
+	@Test
+	public void testMostInfluentialSubModular2() {
+		ArrayList<String> expected = new ArrayList<String>();
+		ArrayList<String> actual = B.mostInfluentialSubModular(3);
+		assertEquals(expected,actual);
+	}
 }
