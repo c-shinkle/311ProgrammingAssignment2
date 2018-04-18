@@ -109,26 +109,26 @@ public class NetworkInfluence {
 		Queue<String> queue = new LinkedList<>();
 		HashMap<String, Integer> dist = new HashMap<>();
 		HashMap<String, String> prev = new HashMap<>();
-		
-		for (String node : masterList) 
+
+		for (String node : masterList)
 			dist.put(node, Integer.MAX_VALUE);
-		
+
 		dist.replace(u, 0);
 		queue.add(u);
-		
+
 		while (!queue.isEmpty()) {
 			String current = queue.poll();
-			
+
 			if (current.equals(v)) {
 				buildPath(current, result, prev);
 				return result;
 			}
 
 			ArrayList<String> outVertices = graph.get(current);
-			
+
 			if (outVertices == null)
 				continue;
-			
+
 			for (String neighbor : outVertices) {
 				int alt = dist.get(current) + 1;
 				if (alt < dist.get(neighbor)) {
@@ -176,13 +176,13 @@ public class NetworkInfluence {
 	public float influence(String u) {
 		HashMap<String, ArrayList<String>> MST = buildMST(u);
 		float result = influenceHelper(u, .5, MST);
-		result = result +1;
+		result = result + 1;
 		return result;
 
 	}
-	
-	//TODO
-	//change this to private before submitting
+
+	// TODO
+	// change this to private before submitting
 	public HashMap<String, ArrayList<String>> buildMST(String vertex) {
 		HashMap<String, ArrayList<String>> MST = new HashMap<>();
 		HashMap<String, String> visited = new HashMap<>();
@@ -221,10 +221,10 @@ public class NetworkInfluence {
 	public float influence(ArrayList<String> s) {
 		// implementation
 		HashMap<String, String> GivenStringsMap = new HashMap<>();
-		int currentLowest=0;
+		int currentLowest = 0;
 		int current = Integer.MAX_VALUE;
-		float runningTotal=0;
-		for(String givenString : s){
+		float runningTotal = 0;
+		for (String givenString : s) {
 			GivenStringsMap.put(givenString, givenString);
 		}
 		for (String masterString : masterList) {
@@ -247,21 +247,20 @@ public class NetworkInfluence {
 				}
 			}
 		}
-		//Added this to account for the influental node on themselves
+		// Added this to account for the influental node on themselves
 		runningTotal = runningTotal + s.size();
 		return runningTotal;
 	}
 
-	private int power(int x, int y)
-    {
-        if (y == 0)
-            return 1;
-        else if (y % 2 == 0)
-            return power(x, y / 2) * power(x, y / 2);
-        else
-            return x * power(x, y / 2) * power(x, y / 2);
-    }
-	
+	private int power(int x, int y) {
+		if (y == 0)
+			return 1;
+		else if (y % 2 == 0)
+			return power(x, y / 2) * power(x, y / 2);
+		else
+			return x * power(x, y / 2) * power(x, y / 2);
+	}
+
 	public ArrayList<String> mostInfluentialDegree(int k) {
 		ArrayList<String> list = new ArrayList<String>();
 		PriorityQueue<Tuple> pq = new PriorityQueue<Tuple>(k, new Comparator<Tuple>() {
@@ -314,21 +313,27 @@ public class NetworkInfluence {
 		// do the loop k times
 		for (int x = 0; x < k; x++) {
 
-			PriorityQueue<subModularTuple> pq = new PriorityQueue<subModularTuple>(k, new Comparator<subModularTuple>() {
-				public int compare(subModularTuple lhs, subModularTuple rhs) {
-					if (lhs.dist <= rhs.dist)
-						return 1;
-					else if (lhs.dist > rhs.dist)
-						return -1;
-					return 0;
-				}
-			});
+			PriorityQueue<subModularTuple> pq = new PriorityQueue<subModularTuple>(k,
+					new Comparator<subModularTuple>() {
+						public int compare(subModularTuple lhs, subModularTuple rhs) {
+							if (lhs.dist <= rhs.dist)
+								return 1;
+							else if (lhs.dist > rhs.dist)
+								return -1;
+							return 0;
+						}
+					});
 			for (int i = 0; i < masterTemp.length; i++) {
-				ArrayList<String> vList = list;
-				vList.add(masterTemp[i]);
-				subModularTuple vInf = new subModularTuple(masterTemp[i], influence(vList), i);
-				pq.add(vInf);
+				if (masterTemp[i] != null) {
+					ArrayList<String> vList = new ArrayList<String>();
+					for (int j = 0; j < list.size(); j++) {
+						vList.add(list.get(j));
+					}
+					vList.add(masterTemp[i]);
+					subModularTuple vInf = new subModularTuple(masterTemp[i], influence(vList), i);
+					pq.add(vInf);
 
+				}
 			}
 
 			// add found vertice to the list and remove it from masterTemp.
@@ -444,3 +449,4 @@ public class NetworkInfluence {
 //		System.out.println("Their influence is:" + example.influence(submodular));
 	}
 }
+
