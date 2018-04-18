@@ -43,7 +43,7 @@ public class InfluenceListTests {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
 		ab.add("D");
-		float expected = 9/2;
+		float expected = (float)4.5;
 		float actual = C.influence(ab);
 		assertEquals(expected, actual,.001);
 	}
