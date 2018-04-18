@@ -110,7 +110,7 @@ public class NetworkInfluence {
 		HashMap<String, Tuple> dist = new HashMap<>();
 		HashMap<String, String> prev = new HashMap<>();
 		HashMap<String, Boolean> visited = new HashMap<>();
-		
+
 		q.add(new Tuple(u, 0));
 
 		for (String s : masterList) {
@@ -122,28 +122,28 @@ public class NetworkInfluence {
 			}
 		}
 
-		for (Tuple current = q.poll();!q.isEmpty(); current = q.poll()) {
+		for (Tuple current = q.poll(); !q.isEmpty(); current = q.poll()) {
 			// If we've already visited this node, we can skip over it. This can
 			// happen because there is a very good chance vertices will appear
 			// more than once in the priority queue. See details below.
 			if (visited.get(current.string)) {
 				continue;
 			}
-			
-			//Mark the vertex as visited
+
+			// Mark the vertex as visited
 			visited.replace(current.string, true);
-			
+
 			// If we find the node we're looking for,
 			// we can stop early.
 			if (current.string.equals(v)) {
 				buildPath(current, result, prev);
 				return result;
 			}
-			
+
 			outVertices = graph.get(current.string);
 			if (outVertices == null)
 				continue;
-			
+
 			int alt = current.dist + 1;
 			for (String s : outVertices) {
 				Tuple t = dist.get(s);
@@ -159,7 +159,7 @@ public class NetworkInfluence {
 					q.add(new Tuple(s, alt));
 				}
 			}
-			
+
 		}
 		return result;
 	}
@@ -176,7 +176,7 @@ public class NetworkInfluence {
 		while (!stack.isEmpty()) {
 			result.add(stack.pop());
 		}
-		
+
 	}
 
 	public int distance(String u, String v) {
@@ -197,36 +197,57 @@ public class NetworkInfluence {
 	}
 
 	public float influence(String u) {
-		String[] temp = new String[masterList.length];
-		for(int i = 0;i<temp.length;i++){
-			temp[i]= masterList[i];
-		}
-		return influenceHelper(u, 0, temp);
-		
-	
-	}
-	private float influenceHelper(String u, int layer, String[] arr){
-	int size = outDegree(u);
-		if(size == 0){
-			return (float) (1.0/powerFunction(layer));
-		}
-		int i = 0;
-		float influenceTotal = (float) 1.0/powerFunction(layer);
+		HashMap<String, ArrayList<String>> MST = buildMST(u);
+		float result = influenceHelper(u, .5, MST);
+		return result;
 
-		while(i<size){
-			influenceTotal +=influenceHelper(graph.get(u).get(i),layer+1,arr);	
-			i++;
-			
-		}
-		return influenceTotal;
 	}
-	public int powerFunction(int pow){
+	
+	//TODO
+	//change this to private before submitting
+	public HashMap<String, ArrayList<String>> buildMST(String vertex) {
+		HashMap<String, ArrayList<String>> MST = new HashMap<>();
+		HashMap<String, String> visited = new HashMap<>();
+		Queue<String> queue = new LinkedList<>();
+		visited.putIfAbsent(vertex, vertex);
+		queue.add(vertex);
+		while (!queue.isEmpty()) {
+			String current = queue.poll();
+			ArrayList<String> children = graph.get(current);
+			ArrayList<String> newChildren = new ArrayList<String>();
+			MST.put(current, newChildren);
+			if (children != null) {
+				for (String child : children) {
+					if (!visited.containsKey(child)) {
+						newChildren.add(child);
+						visited.putIfAbsent(child, child);
+						queue.add(child);
+					}
+				}
+			}
+		}
+		return MST;
+	}
+
+	private float influenceHelper(String vertex, double denominator, HashMap<String, ArrayList<String>> MST) {
+		int size = MST.get(vertex).size();
+		double influenceTotal = denominator * size;
+		ArrayList<String> children = MST.get(vertex);
+		for (int i = 0; i < size; i++) {
+			String child = children.get(i);
+			influenceTotal += influenceHelper(child, denominator / 2, MST);
+		}
+		return (float) influenceTotal;
+	}
+
+	public int powerFunction(int pow) {
 		int total = 1;
-			for(int i =0; i<pow;i++){
-				total = total*2;
+		for (int i = 0; i < pow; i++) {
+			total = total * 2;
 		}
 		return total;
 	}
+
 	public float influence(ArrayList<String> s) {
 		// implementation
 

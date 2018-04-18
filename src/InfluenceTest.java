@@ -18,8 +18,15 @@ public class InfluenceTest {
 	
 	@Test
 	public void testAShortestPath() {
-		float expected = (float)1.5;
+		float expected = (float)1.25;
 		float actual = A.influence("A");
+		assertEquals(expected, actual,.001);
+	}
+	
+	@Test
+	public void testBShortedPath() {
+		float expected = (float) 1.5;
+		float actual = B.influence("A");
 		assertEquals(expected, actual,.001);
 	}
 }
