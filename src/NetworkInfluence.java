@@ -278,17 +278,61 @@ public class NetworkInfluence {
 	}
 
 	public ArrayList<String> mostInfluentialModular(int k) {
-		// implementation
+		ArrayList<String> list = new ArrayList<String>();
+		PriorityQueue<Tuple2> pq = new PriorityQueue<Tuple2>(k, new Comparator<Tuple2>() {
+			public int compare(Tuple2 lhs, Tuple2 rhs) {
+				if (lhs.dist < rhs.dist)
+					return 1;
+				else if (lhs.dist > rhs.dist)
+					return -1;
+				return 0;
+			}
+		});
+		for (int i = 0; i < masterList.length; i++) {
+			Tuple2 element = new Tuple2(masterList[i], influence(masterList[i]));
+			pq.add(element);
+		}
+		for (int i = 0; i < k; i++) {
+			String s = pq.poll().string;
+			list.add(s);
+		}
+		return list;
 
-		// replace this:
-		return null;
 	}
 
 	public ArrayList<String> mostInfluentialSubModular(int k) {
-		// implementation
+		ArrayList<String> list = new ArrayList<String>();
+		String[] masterTemp = masterList;
 
-		// replace this:
-		return null;
+		// do the loop k times
+		for (int x = 0; x < k; x++) {
+
+			PriorityQueue<Tuple3> pq = new PriorityQueue<Tuple3>(k, new Comparator<Tuple3>() {
+				public int compare(Tuple3 lhs, Tuple3 rhs) {
+					if (lhs.dist < rhs.dist)
+						return 1;
+					else if (lhs.dist > rhs.dist)
+						return -1;
+					return 0;
+				}
+			});
+			for (int i = 0; i < masterTemp.length; i++) {
+				ArrayList<String> vList = list;
+				vList.add(masterTemp[i]);
+				Tuple3 vInf = new Tuple3(masterTemp[i], influence(vList), i);
+				pq.add(vInf);
+
+			}
+
+			// add found vertice to the list and remove it from masterTemp.
+			Tuple3 vertice = pq.poll();
+			String s = vertice.string;
+			int index = vertice.index;
+			masterTemp[index] = null;
+			list.add(s);
+		}
+		return list;
+
 	}
 
 	private class Tuple implements Comparable<Tuple> {
@@ -303,6 +347,64 @@ public class NetworkInfluence {
 
 		@Override
 		public int compareTo(Tuple other) {
+			if (this.dist < other.dist)
+				return -1;
+			else if (this.dist > other.dist)
+				return 1;
+			else
+				return 0;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + string + ", " + dist + ")";
+
+		}
+
+	}
+
+	private class Tuple2 implements Comparable<Tuple2> {
+
+		String string;
+		float dist;
+
+		public Tuple2(String s, float i) {
+			string = s;
+			dist = i;
+		}
+
+		@Override
+		public int compareTo(Tuple2 other) {
+			if (this.dist < other.dist)
+				return -1;
+			else if (this.dist > other.dist)
+				return 1;
+			else
+				return 0;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + string + ", " + dist + ")";
+
+		}
+
+	}
+
+	private class Tuple3 implements Comparable<Tuple3> {
+
+		String string;
+		float dist;
+		int index;
+
+		public Tuple3(String s, float i, int in) {
+			string = s;
+			dist = i;
+			index = in;
+		}
+
+		@Override
+		public int compareTo(Tuple3 other) {
 			if (this.dist < other.dist)
 				return -1;
 			else if (this.dist > other.dist)
