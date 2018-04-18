@@ -68,13 +68,11 @@ public class WikiCrawler {
 				ArrayList<String> pageLinks = new ArrayList<String>();
 				for (int i = 0; i < curPageLinks.size(); i++) {
 					if (!hasVisited(curPageLinks.get(i), visited)) {
-						if (hasTopics(curPageLinks.get(i))) {
-							queue.add(curPageLinks.get(i));
-						}
-						visited.add(curPageLinks.get(i));
+						queue.add(curPageLinks.get(i));
+						pageLinks.add(curPageLinks.get(i));
+						graph.put(curPage, pageLinks);
 					}
-					pageLinks.add(curPageLinks.get(i));
-					graph.put(curPage, pageLinks);
+					visited.add(curPageLinks.get(i));
 				}
 			}
 		}
@@ -91,20 +89,34 @@ public class WikiCrawler {
 		return false;
 	}
 
-	// Checks if the �actual text component� contains all of the topics
+	// Checks if the ?actual text component? contains all of the topics
 	private boolean hasTopics(String url) throws IOException, InterruptedException {
 		String subHTML = fetchPage(url);
+		ArrayList<String> topix = new ArrayList<String>();
 		for (int i = 0; i < topics.size(); i++) {
-			if (!subHTML.toLowerCase().contains(topics.get(i).toLowerCase())) {
+			topix.add(topics.get(i));
+		}
+		Scanner scan = new Scanner(subHTML);
+		while (scan.hasNextLine()) {
+			String next = scan.nextLine();
+			for (int i = 0; i < topix.size(); i++) {
+				if (next.contains(topix.get(i))) {
+					topix.set(i, null);
+				}
+			}
+		}
+		scan.close();
+		for (int i = 0; i < topix.size(); i++) {
+			if (topix.get(i) != null) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	// returns all of the valid links in the �actual text component� of the current
+	// returns all of the valid links in the ?actual text component? of the current
 	// page.
-	private ArrayList<String> findLinks(String subHTML, String url) {
+	private ArrayList<String> findLinks(String subHTML, String url) throws IOException, InterruptedException {
 		ArrayList<String> links = new ArrayList<String>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
@@ -125,8 +137,9 @@ public class WikiCrawler {
 					}
 				}
 				String possibleLink = next.substring(startIndex, endIndex);
-				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org) && !links.contains(possibleLink )
-						&& !possibleLink.equals(url)) {
+				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org)
+						&& !links.contains(possibleLink) && !possibleLink.equals(url)) {
+					if (hasTopics(possibleLink)) {
 						if (foundLinks.size() < max) {
 							if (!foundLinks.contains(possibleLink)) {
 								foundLinks.add(possibleLink);
@@ -138,12 +151,13 @@ public class WikiCrawler {
 					}
 				}
 			}
+		}
 		scan.close();
 		return links;
 	}
 
 	// makes a request to the server to fetch html of the current page and creates a
-	// string for the �actual text component� of the page.
+	// string for the ?actual text component? of the page.
 	private String fetchPage(String currentPage) throws IOException, InterruptedException, UnknownHostException {
 		requests++;
 		int mod = requests % 25;
@@ -181,24 +195,27 @@ public class WikiCrawler {
 	// Takes the graph and saves it to a file by listing out all of the edges.
 	private void writeToFile(LinkedHashMap<String, ArrayList<String>> graph) throws IOException {
 		System.out.println(fileName);
-		PrintWriter printWriter = new PrintWriter(fileName,"UTF-8");
+		PrintWriter printWriter = new PrintWriter(fileName, "UTF-8");
 		printWriter.println(foundLinks.size());
 		for (Map.Entry<String, ArrayList<String>> entry : graph.entrySet()) {
 			String key = entry.getKey();
-		    ArrayList<String> value = entry.getValue();
-		    for(int i=0; i<value.size();i++) {
-		    	String vertice = value.get(i);
-		    	printWriter.print(key + " " + vertice);
+			ArrayList<String> value = entry.getValue();
+			for (int i = 0; i < value.size(); i++) {
+				String vertice = value.get(i);
+				printWriter.print(key + " " + vertice);
 				printWriter.println();
-		    }
+			}
 		}
 		printWriter.close();
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		ArrayList<String> topics = new ArrayList<String>();
-		WikiCrawler example = new WikiCrawler("/wiki/Complexity_theory", 20, topics, "Test.txt");
+		topics.add("Iowa State");
+		topics.add("Cyclones");
+		WikiCrawler example = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
 		example.crawl();
 		System.out.println("cheese");
 	}
 }
+
