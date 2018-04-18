@@ -33,7 +33,7 @@ public class InfluenceListTests {
 	public void testAInfluenceList2() {
 		ArrayList<String> ab = new ArrayList<String>();
 		ab.add("A");
-		ab.add("C");
+		ab.add("B");
 		
 		float expected = (float) 3;
 		float actual = A.influence(ab);
