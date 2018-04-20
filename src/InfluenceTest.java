@@ -17,9 +17,16 @@ public class InfluenceTest {
 	}
 	
 	@Test
-	public void testAInfluence() {
-		float expected = (float)2.25;
+	public void testAInfluence1() {
+		float expected = (float) 2.25;
 		float actual = A.influence("A");
+		assertEquals(expected, actual,.001);
+	}
+	
+	@Test
+	public void testAInfluence2() {
+		float expected = 1;
+		float actual = A.influence("Z");
 		assertEquals(expected, actual,.001);
 	}
 	
