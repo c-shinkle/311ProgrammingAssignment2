@@ -313,16 +313,17 @@ public class NetworkInfluence {
 						}
 					});
 			
+			ArrayList<String> vList = new ArrayList<String>();
+			for (int j = 0; j < list.size(); j++) {
+				vList.add(list.get(j));
+			}
+			
 			for (int i = 0; i < masterTemp.length; i++) {
 				if (masterTemp[i]) {
-					ArrayList<String> vList = new ArrayList<String>();
-					for (int j = 0; j < list.size(); j++) {
-						vList.add(list.get(j));
-					}
 					vList.add(masterList[i]);
 					subModularTuple vInf = new subModularTuple(masterList[i], influence(vList), i);
 					pq.add(vInf);
-
+					vList.remove(vList.size()-1);
 				}
 			}
 
