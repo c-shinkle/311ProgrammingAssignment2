@@ -423,8 +423,8 @@ public class NetworkInfluence {
 
 	}
 
-	public static void main(String[] args) throws IOException {
-		NetworkInfluence example = new NetworkInfluence("wikiCC.txt");
+	public static void main(String[] args) {
+		NetworkInfluence example = new NetworkInfluence("wikiCS.txt");
 		ArrayList<String> degree = example.mostInfluentialDegree(10);
 		ArrayList<String> modular = example.mostInfluentialModular(10);
 		ArrayList<String> submodular = example.mostInfluentialSubModular(10);
@@ -436,7 +436,7 @@ public class NetworkInfluence {
 		System.out.println("Their influence is: " + example.influence(modular));
 		
 		System.out.println("The top 10 influential submodular are: \n" + submodular);
-		System.out.println("Their influence is:" + example.influence(submodular));
+		System.out.println("Their influence is: " + example.influence(submodular));
 	}
 }
 

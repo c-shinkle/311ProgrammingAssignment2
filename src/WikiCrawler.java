@@ -248,9 +248,9 @@ public class WikiCrawler {
 
 	public static void main(String[] args) {
 		ArrayList<String> topics = new ArrayList<String>();
-		topics.add("Iowa State");
-		topics.add("Cyclones");
-		WikiCrawler example = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
+//		topics.add("Iowa State");
+//		topics.add("Cyclones");
+		WikiCrawler example = new WikiCrawler("/wiki/Computer_Science", 100, topics, "WikiCS.txt");
 		example.crawl();
 		System.out.println("cheese");
 	}
