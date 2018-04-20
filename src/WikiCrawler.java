@@ -12,36 +12,34 @@
 */
 
 import java.io.BufferedReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 
+/**
+ * 
+ * @author Benjamin Trettin, Christian Shinkle, Alec Harrison
+ *
+ */
 public class WikiCrawler {
 
 	public static final String BASE_URL = "https://en.wikipedia.org";
 
-	private int max;
+	private int max, requests;
 
-	private String seedUrl;
+	private String seedUrl, fileName;
 
 	private ArrayList<String> topics;
-
-	private String fileName;
-
-	private int requests;
 
 	private HashMap<String, String> foundGoodLinks, foundBadLinks;
 
@@ -78,7 +76,12 @@ public class WikiCrawler {
 		writeToFile(graph);
 	}
 
-	// Checks if the ?actual text component? contains all of the topics
+	/**
+	 * Checks if the actual text component contains all of the topics
+	 * 
+	 * @param url
+	 * @return
+	 */
 	private boolean hasTopics(String url) {
 		if (topics.size() == 0)
 			return true;
@@ -103,8 +106,14 @@ public class WikiCrawler {
 		return true;
 	}
 
-	// returns all of the valid links in the ?actual text component? of the
-	// current page.
+	/**
+	 * returns all of the valid links in the ?actual text component? of the
+	 * current page.
+	 * 
+	 * @param subHTML
+	 * @param url
+	 * @return
+	 */
 	private ArrayList<String> findLinks(String subHTML, String url) {
 		ArrayList<String> links = new ArrayList<String>();
 		HashMap<String, String> linksLookUpTable = new HashMap<>();
@@ -130,24 +139,27 @@ public class WikiCrawler {
 				String possibleLink = next.substring(startIndex, endIndex);
 
 				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org)
-						&& !links.contains(possibleLink) && !possibleLink.equals(url)) {
+						&& !linksLookUpTable.containsKey(possibleLink) && !possibleLink.equals(url)) {
 					if (foundBadLinks.containsKey(possibleLink)) {
-						//do nothing
+						// do nothing
 					} else if (foundGoodLinks.size() < max) {
 						if (!foundGoodLinks.containsKey(possibleLink)) {
-							//EXPENSIVE CALL
+							// EXPENSIVE CALL
 							if (hasTopics(possibleLink)) {
 								foundGoodLinks.put(possibleLink, possibleLink);
 								links.add(possibleLink);
+								linksLookUpTable.put(possibleLink, possibleLink);
 							} else {
 								foundBadLinks.put(possibleLink, possibleLink);
 							}
 						} else {
 							links.add(possibleLink);
+							linksLookUpTable.put(possibleLink, possibleLink);
 						}
 					} else if (foundGoodLinks.size() == max) {
 						if (foundGoodLinks.containsKey(possibleLink)) {
 							links.add(possibleLink);
+							linksLookUpTable.put(possibleLink, possibleLink);
 						}
 					}
 				}
@@ -157,9 +169,13 @@ public class WikiCrawler {
 		return links;
 	}
 
-	// makes a request to the server to fetch html of the current page and
-	// creates a
-	// string for the ?actual text component? of the page.
+	/**
+	 * makes a request to the server to fetch html of the current page and
+	 * creates a string for the actual text component of the page.
+	 * 
+	 * @param currentPage
+	 * @return
+	 */
 	private String fetchPage(String currentPage) {
 		requests++;
 		int mod = requests % 25;
@@ -204,7 +220,10 @@ public class WikiCrawler {
 		return subHTML;
 	}
 
-	// Takes the graph and saves it to a file by listing out all of the edges.
+	/**
+	 * Takes the graph and saves it to a file by listing out all of the edges.
+	 * @param graph
+	 */
 	private void writeToFile(LinkedHashMap<String, ArrayList<String>> graph) {
 		System.out.println(fileName);
 		PrintWriter printWriter = null;
