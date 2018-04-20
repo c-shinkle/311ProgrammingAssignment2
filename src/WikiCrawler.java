@@ -37,21 +37,22 @@ public class WikiCrawler {
 
 	private String seedUrl;
 
-	ArrayList<String> topics;
+	private ArrayList<String> topics;
 
 	private String fileName;
 
 	private int requests;
 
-	private HashMap<String, String> foundLinks;
+	private HashMap<String, String> foundGoodLinks, foundBadLinks;
 
 	public WikiCrawler(String seedUrl, int max, ArrayList<String> topics, String fileName) {
 		this.max = max;
 		this.seedUrl = seedUrl;
 		this.topics = topics;
 		this.fileName = fileName;
-		foundLinks = new HashMap<>();
-		foundLinks.put(seedUrl, seedUrl);
+		foundGoodLinks = new HashMap<>();
+		foundBadLinks = new HashMap<>();
+		foundGoodLinks.put(seedUrl, seedUrl);
 	}
 
 	public void crawl() {
@@ -106,6 +107,7 @@ public class WikiCrawler {
 	// current page.
 	private ArrayList<String> findLinks(String subHTML, String url) {
 		ArrayList<String> links = new ArrayList<String>();
+		HashMap<String, String> linksLookUpTable = new HashMap<>();
 		Scanner scan = new Scanner(subHTML);
 		String wiki = "/wiki/";
 		String href = "href";
@@ -124,24 +126,29 @@ public class WikiCrawler {
 						break;
 					}
 				}
-				
+
 				String possibleLink = next.substring(startIndex, endIndex);
-				
-				
-				
-				
+
 				if (!possibleLink.contains("#") && !possibleLink.contains(":") && !possibleLink.contains(org)
 						&& !links.contains(possibleLink) && !possibleLink.equals(url)) {
-					if (foundLinks.size() < max) {
-						if (!foundLinks.containsKey(possibleLink)) {
-							if (hasTopics(possibleLink))
-								foundLinks.put(possibleLink, possibleLink);
-						}
-						links.add(possibleLink);
-						
-					} else if (foundLinks.size() == max && foundLinks.containsKey(possibleLink)) {
-						if (hasTopics(possibleLink))
+					if (foundBadLinks.containsKey(possibleLink)) {
+						//do nothing
+					} else if (foundGoodLinks.size() < max) {
+						if (!foundGoodLinks.containsKey(possibleLink)) {
+							//EXPENSIVE CALL
+							if (hasTopics(possibleLink)) {
+								foundGoodLinks.put(possibleLink, possibleLink);
+								links.add(possibleLink);
+							} else {
+								foundBadLinks.put(possibleLink, possibleLink);
+							}
+						} else {
 							links.add(possibleLink);
+						}
+					} else if (foundGoodLinks.size() == max) {
+						if (foundGoodLinks.containsKey(possibleLink)) {
+							links.add(possibleLink);
+						}
 					}
 				}
 			}
@@ -207,7 +214,7 @@ public class WikiCrawler {
 			System.out.println("There was an exception thrown while " + "trying to write to" + fileName + ".");
 			System.exit(1);
 		}
-		printWriter.println(foundLinks.size());
+		printWriter.println(foundGoodLinks.size());
 		for (Map.Entry<String, ArrayList<String>> entry : graph.entrySet()) {
 			String key = entry.getKey();
 			ArrayList<String> value = entry.getValue();
@@ -222,9 +229,9 @@ public class WikiCrawler {
 
 	public static void main(String[] args) {
 		ArrayList<String> topics = new ArrayList<String>();
-//		topics.add("Iowa State");
-//		topics.add("Cyclones");
-		WikiCrawler example = new WikiCrawler("/wiki/Iowa_State_University", 5, topics, "WikiISU.txt");
+		topics.add("Iowa State");
+		topics.add("Cyclones");
+		WikiCrawler example = new WikiCrawler("/wiki/Iowa_State_University", 100, topics, "WikiISU.txt");
 		example.crawl();
 		System.out.println("cheese");
 	}
